@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/*********************************************************************
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+For more information, please refer to <http://unlicense.org/>
+*********************************************************************/
+
+/*
+WiTeX
+https://github.com/AndrewBelt/WiTeX
+*/
+
+
+/* Latin Modern (LaTeX default) font */
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: normal;
+	src: url('fonts/lmroman10-regular.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: normal;
+	src: url('fonts/lmroman10-bold.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: italic;
+	src: url('fonts/lmroman10-italic.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: italic;
+	src: url('fonts/lmroman10-bolditalic.woff') format('woff');
+}
+
+/* Page Layout */
+
+body {
+  background-color: white;
+  font-size: 15pt;
+}
+
+body {
+	font-family: 'Latin Modern Roman', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	border: none;
+	font-weight: bold;
+}
+
+a, a:visited {
+	color: #a00;
+}
+
+ul {
+	list-style: disc;
+}
+
+/* Content Box */
+
+.content {
+	max-width: 720px;
+	margin: 2em auto;
+}
+
+.content > h1:first-child {
+	text-align: center;
+	display: block;
+}
+
+/* Article Body */
+
+.content {
+	text-align: justify;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+}
+
+dl dd {
+	/* center definitions (most useful for display equations) */
+	text-align: center;
+}
+
+code {
+	border-radius: 3px;
+	background-color: black;
+	color: white;
+	padding: 2px 3px;
+}
+</style>
+
+</head>
+<body>
+<ul>
+  <li><a href="#chapter-1-i-skipped-a-bunch-of-boring-stuff-up-to-page-30">Chapter 1: I skipped a bunch of boring stuff (up to page 30)</a>
+  <ul>
+    <li><a href="#types-of-penetration-tests">Types of Penetration Tests</a>
+    <ul>
+      <li><a href="#overt-penetration-testing">Overt Penetration Testing</a></li>
+      <li><a href="#covert-penetration-testing">Covert Penetration Testing</a></li>
+    </ul></li>
+    <li><a href="#vulnerability-scanners">Vulnerability Scanners</a></li>
+  </ul></li>
+  <li><a href="#chapter-2-metasploit-basics">Chapter 2: Metasploit Basics</a>
+  <ul>
+    <li><a href="#terminology">Terminology:</a></li>
+    <li><a href="#metasploit-interfaces">Metasploit Interfaces</a>
+    <ul>
+      <li><a href="#msfconsole">MSFconsole</a></li>
+      <li><a href="#msfcli">MSFcli</a></li>
+      <li><a href="#armitage">Armitage</a></li>
+    </ul></li>
+    <li><a href="#metasploit-utilities">Metasploit Utilities</a>
+    <ul>
+      <li><a href="#msfpayload">MSFpayload</a></li>
+      <li><a href="#msfencode">MSFencode</a></li>
+      <li><a href="#nasm-shell">Nasm Shell</a></li>
+    </ul></li>
+    <li><a href="#metasploit-express-and-metasploit-pro">Metasploit Express and Metasploit Pro</a></li>
+  </ul></li>
+  <li><a href="#chapter-3-intelligence-gathering">Chapter 3: Intelligence Gathering</a>
+  <ul>
+    <li><a href="#passive-information-gathering">Passive Information Gathering</a></li>
+    <li><a href="#whois-lookups">whois Lookups</a></li>
+    <li><a href="#netcraft">Netcraft</a></li>
+    <li><a href="#nslookup">NSLookup</a></li>
+  </ul></li>
+  <li><a href="#active-information-gathering">Active Information Gathering</a>
+  <ul>
+    <li><a href="#port-scanning-with-nmap">Port Scanning with Nmap</a></li>
+    <li><a href="#working-with-databases-in-metasploit">Working with Databases in Metasploit</a></li>
+    <li><a href="#importing-nmap-results-into-metasploit">Importing Nmap Results into Metasploit</a></li>
+    <li><a href="#advanced-nmap-scanning-tcp-idle-scan">Advanced Nmap Scanning: TCP Idle Scan</a></li>
+    <li><a href="#runninh-nmap-from-msfconsole">Runninh Nmap from MSFconsole</a></li>
+    <li><a href="#port-scanning-with-metasploit">Port Scanning with Metasploit</a></li>
+  </ul></li>
+  <li><a href="#targeted-scanning">Targeted Scanning</a>
+  <ul>
+    <li><a href="#server-message-block-scanning">Server Message Block Scanning</a></li>
+    <li><a href="#hunting-for-poorly-configured-miscrosoft-sql-servers">Hunting for Poorly Configured Miscrosoft SQL Servers</a></li>
+    <li><a href="#ssh-server-scanning">SSH Server Scanning</a></li>
+    <li><a href="#ftp-scanning">FTP Scanning</a></li>
+    <li><a href="#simple-network-management-protocol-sweeping">Simple Network Management Protocol Sweeping</a></li>
+    <li><a href="#writing-a-custom-scanner">Writing a Custom Scanner</a></li>
+  </ul></li>
+  <li><a href="#chapter-4-vulnerability-scanning">Chapter 4: Vulnerability Scanning</a>
+  <ul>
+    <li><a href="#the-basic-vulnerability-scan">The Basic Vulnerability Scan</a></li>
+  </ul></li>
+  <li><a href="#scanning-with-nexpose">Scanning with NeXpose</a>
+  <ul>
+    <li><a href="#configuration">Configuration</a></li>
+    <li><a href="#the-new-site-wizard">The New Site Wizard</a></li>
+    <li><a href="#the-new-manual-scan-wizard">The New Manual Scan Wizard</a></li>
+    <li><a href="#the-new-report-wizard">The New Report Wizard</a></li>
+    <li><a href="#importing-your-report-into-metasploit-framework">Importing Your Report into Metasploit Framework</a></li>
+    <li><a href="#running-nexpose-within-msfconsole">Running NeXpose Within MSFconsole</a></li>
+  </ul></li>
+  <li><a href="#scanning-with-nessus">Scanning with Nessus</a>
+  <ul>
+    <li><a href="#nessus-configuration">Nessus Configuration</a></li>
+    <li><a href="#creating-a-nessus-scan-policy">Creating a Nessus Scan Policy</a></li>
+    <li><a href="#running-a-nessus-scan">Running a Nessus Scan</a></li>
+    <li><a href="#nessus-reports">Nessus Reports</a></li>
+    <li><a href="#importing-results-into-the-metasploit-framework">Importing Results into the Metasploit Framework</a></li>
+    <li><a href="#scanning-with-nessus-from-within-metasploit">Scanning with Nessus from Within Metasploit</a></li>
+  </ul></li>
+  <li><a href="#specialty-vulnerability-scanners">Specialty Vulnerability Scanners</a>
+  <ul>
+    <li><a href="#validating-smb-logins">Validating SMB Logins</a></li>
+    <li><a href="#scanning-for-open-vnc-authentication">Scanning for Open VNC Authentication</a></li>
+    <li><a href="#scanning-for-open-x11-servers">Scanning for Open X11 Servers</a></li>
+    <li><a href="#using-scan-results-for-autopwning">Using Scan Results for Autopwning</a></li>
+  </ul></li>
+  <li><a href="#chapter-5-the-joy-of-exploitation">Chapter 5: The Joy of Exploitation</a>
+  <ul>
+    <li><a href="#basic-exploitation">Basic Exploitation</a>
+    <ul>
+      <li><a href="#msf-show-exploits">msf> show exploits</a></li>
+      <li><a href="#msf-show-auxiliary">msf> show auxiliary</a></li>
+      <li><a href="#msf-show-options">msf> show options</a></li>
+      <li><a href="#msf-show-payloads">msf> show payloads</a></li>
+      <li><a href="#msf-show-targets">msf> show targets</a></li>
+      <li><a href="#info">info</a></li>
+      <li><a href="#set-and-unset">set and unset</a></li>
+      <li><a href="#setg-and-unsetg">setg and unsetg</a></li>
+      <li><a href="#save">save</a></li>
+    </ul></li>
+    <li><a href="#exploiting-your-first-machine">Exploiting Your First Machine</a></li>
+  </ul></li>
+</ul>
+<h1 id="chapter-1-i-skipped-a-bunch-of-boring-stuff-up-to-page-30">Chapter 1: I skipped a bunch of boring stuff (up to page 30)</h1>
+
+<ul>
+<li>It talked about ethical hacking - ugh</li>
+<li>Also talked about the pentest process, as if
+it wasn't obvious enough</li>
+<li>Check out http://www.pentest-standard.org/ though</li>
+</ul>
+
+<h2 id="types-of-penetration-tests">Types of Penetration Tests</h2>
+
+<h3 id="overt-penetration-testing">Overt Penetration Testing</h3>
+
+<ul>
+<li>Work with the organization</li>
+<li>In cooperation with organization's IT personnel</li>
+<li>May not be representative of an actual attack</li>
+<li>May not measure incident response accurately</li>
+<li><p>Less time and effort invested</p>
+
+<h3 id="covert-penetration-testing">Covert Penetration Testing</h3></li>
+<li><p>Performed without the knowledge of most of the
+organization</p></li>
+<li>Tests the internal security team</li>
+<li>Takes more effort than overt pentest</li>
+<li>Usually preferred method</li>
+</ul>
+
+<h2 id="vulnerability-scanners">Vulnerability Scanners</h2>
+
+<ul>
+<li>Fingerprints OS information</li>
+<li>Great to identify out-of-date software</li>
+</ul>
+
+<h1 id="chapter-2-metasploit-basics">Chapter 2: Metasploit Basics</h1>
+
+<h2 id="terminology">Terminology:</h2>
+
+<ul>
+<li>Exploit: mean by which one takes advantage of a flaw</li>
+<li>Payload: code to be executed after delivery by the
+framework</li>
+<li>Shellcode: set of instructions used as a payload
+when exploitation occurs (usually in assembly language)</li>
+<li>Module: piece of software used by the Metasploit
+Framework</li>
+<li>Listener: Metasploit component which listens for
+an incoming connection</li>
+</ul>
+
+<h2 id="metasploit-interfaces">Metasploit Interfaces</h2>
+
+<h3 id="msfconsole">MSFconsole</h3>
+
+<ul>
+<li>The most popular interface</li>
+<li>Provides an interface to almost every option and
+setting in the Framework</li>
+<li>Launched by running <code>mfconsole</code> in a command line</li>
+<li><code>help &lt;topic&gt;</code> to get help file in mfconsole</li>
+</ul>
+
+<h3 id="msfcli">MSFcli</h3>
+
+<ul>
+<li>Similar to mfconsole, but focuses on scripting</li>
+<li>Compatible with other command line commands, supports
+redirection for example</li>
+<li><code>msfcli -h</code> to display help message</li>
+</ul>
+
+<h3 id="armitage">Armitage</h3>
+
+<ul>
+<li>GUI interface</li>
+<li>run with <code>armitage</code> command, then select <strong>Start MSF</strong></li>
+</ul>
+
+<h2 id="metasploit-utilities">Metasploit Utilities</h2>
+
+<h3 id="msfpayload">MSFpayload</h3>
+
+<ul>
+<li>Allows to generate shellcode, executables, etc to use
+outside of the Framework</li>
+<li><code>msfpayload -h</code></li>
+</ul>
+
+<h3 id="msfencode">MSFencode</h3>
+
+<ul>
+<li>Fixes null characters in code</li>
+<li><code>msfencode -h</code></li>
+<li>x/86/shikataga_nai encoder is excellent</li>
+</ul>
+
+<h3 id="nasm-shell">Nasm Shell</h3>
+
+<ul>
+<li>Helps analyzing assembly code</li>
+<li><code>./nasm_shell.rb</code></li>
+</ul>
+
+<h2 id="metasploit-express-and-metasploit-pro">Metasploit Express and Metasploit Pro</h2>
+
+<ul>
+<li>These are commercial web interfaces</li>
+<li>Include a few extra tools</li>
+<li>Not worth it unless you do pentest for a living, and
+even then...</li>
+</ul>
+
+<h1 id="chapter-3-intelligence-gathering">Chapter 3: Intelligence Gathering</h1>
+
+<ul>
+<li>Gain accurate information about your targets without
+revealing your presence or intentions</li>
+</ul>
+
+<h3 id="passive-information-gathering">Passive Information Gathering</h3>
+
+<ul>
+<li>Passive and indirect: don't touch the target's systems</li>
+<li>Open source intelligence (OSINT)</li>
+<li>Yeti, whois</li>
+</ul>
+
+<h3 id="whois-lookups">whois Lookups</h3>
+
+<ul>
+<li><code>whois secmaniac.net</code></li>
+<li>Check out DNS server hosts. They're often hosted by
+a different company, but large organizations sometimes
+host their own DNS servers which can be exploited</li>
+</ul>
+
+<h3 id="netcraft">Netcraft</h3>
+
+<ul>
+<li>Finds IP address of a server hosting a particular
+website</li>
+</ul>
+
+<h3 id="nslookup">NSLookup</h3>
+
+<ul>
+<li><code>nslookup set type=mx &gt; secmaniac.net</code></li>
+<li>Mail server info</li>
+</ul>
+
+<h2 id="active-information-gathering">Active Information Gathering</h2>
+
+<ul>
+<li>Interacting directly with a system to learn more about
+it</li>
+<li>Must be carefully done, as it is easy to discover</li>
+</ul>
+
+<h3 id="port-scanning-with-nmap">Port Scanning with Nmap</h3>
+
+<ul>
+<li>Port scanning: connecting to ports on an IP address
+one by one to detect open ports</li>
+<li>Identifies running services on a host</li>
+<li><code>nmap</code>, -sS to stealth TCP scan, and -Pn to not use
+ping</li>
+<li>Use -A to get more advanced Service info</li>
+</ul>
+
+<h3 id="working-with-databases-in-metasploit">Working with Databases in Metasploit</h3>
+
+<ul>
+<li>Metasploit supports both MySQL and PostgreSQL (default)</li>
+<li><code>/etc/init.d/postgresql-8.3 start</code> to start
+PostgreSQL</li>
+<li>In msfconsole: <code>db_connect
+postgres:toor@127.0.0.1/msfbook</code></li>
+<li><code>dbstatus</code> to check connection</li>
+</ul>
+
+<h3 id="importing-nmap-results-into-metasploit">Importing Nmap Results into Metasploit</h3>
+
+<ul>
+<li><code>nmap -Pn -SS -A -oX Subnet1 192.168.1.0/24</code> generates
+Subnet1.xml file</li>
+<li>msfconsole <code>db_import Subnet1.xml</code> to import</li>
+<li><code>db_hosts -c address</code> to check</li>
+</ul>
+
+<h3 id="advanced-nmap-scanning-tcp-idle-scan">Advanced Nmap Scanning: TCP Idle Scan</h3>
+
+<ul>
+<li>Stealth by spoofing IP address of another host
+on the network</li>
+<li>Uses incremental IP IDs</li>
+<li>msfconsole <code>use auxiliary/scanner/ip/ipidseq</code></li>
+<li><code>show options</code></li>
+<li><code>set RHOSTS 192.167.1.0/24</code> to set RHOSTS to
+192.168.1.0/24</li>
+<li><code>run</code></li>
+<li>-sI <IP Address> to specify the idle host</li>
+</ul>
+
+<h3 id="runninh-nmap-from-msfconsole">Runninh Nmap from MSFconsole</h3>
+
+<ul>
+<li><code>fb_connect postgres:toor@127.0.0.1/msf3</code></li>
+<li><code>db_nmap</code> runs nmap and automatically stores results</li>
+<li><code>db_services to check</code></li>
+</ul>
+
+<h3 id="port-scanning-with-metasploit">Port Scanning with Metasploit</h3>
+
+<ul>
+<li>Pivoting - using internally connected systems to route
+traffic, ex: bypassing NAT</li>
+<li><code>search portscan</code></li>
+<li>for example, <code>use scanner/portscan/syn</code></li>
+<li><code>set RHOSTS 192.168.1.155</code></li>
+<li><code>run</code></li>
+</ul>
+
+<h2 id="targeted-scanning">Targeted Scanning</h2>
+
+<ul>
+<li>Targeted scans look for particular OS, services,
+program versions, or configs</li>
+</ul>
+
+<h3 id="server-message-block-scanning">Server Message Block Scanning</h3>
+
+<ul>
+<li>Often unused and poorly configured</li>
+<li>SMB</li>
+<li><code>use scanner/smb/smb_version</code></li>
+<li><code>show options</code></li>
+<li><code>set RHOSTS 192.168.1.155</code></li>
+<li><code>run</code></li>
+<li><code>db_hosts -c address,os_flavor</code> to check</li>
+</ul>
+
+<h3 id="hunting-for-poorly-configured-miscrosoft-sql-servers">Hunting for Poorly Configured Miscrosoft SQL Servers</h3>
+
+<ul>
+<li>Often poorly configured</li>
+<li><code>use scanner/mssql/mssql_ping</code></li>
+<li><code>show options</code></li>
+<li><code>set RHOSTS 192.168.1.0/24</code></li>
+<li><code>run</code></li>
+</ul>
+
+<h3 id="ssh-server-scanning">SSH Server Scanning</h3>
+
+<ul>
+<li>Pretty secure, but older versions have vulnerabilities</li>
+<li><code>use scanner/ssh/ssh_version</code></li>
+<li><code>set THREADS 50</code></li>
+<li><code>run</code></li>
+</ul>
+
+<h3 id="ftp-scanning">FTP Scanning</h3>
+
+<ul>
+<li>FTP is often the easiest way into a target network</li>
+<li><code>use scanner/ftp/ftp_version</code></li>
+<li><code>show options</code></li>
+<li><code>set RHOSTS 192.168.1.0/24</code></li>
+<li><code>run</code></li>
+<li>Now let's check if it allows anonymous logins:
+<code>use auxiliary/scanner/ftp/anonymous</code></li>
+</ul>
+
+<h3 id="simple-network-management-protocol-sweeping">Simple Network Management Protocol Sweeping</h3>
+
+<ul>
+<li>Offers considerable information about devices</li>
+<li><code>scanner/snmp/snmp_enum</code></li>
+<li>RO (read-only) and RW (read/write) community
+strings (passwords)</li>
+<li>SNMPv1 and v2 are unsecure, v3 is a lot more secure</li>
+<li><code>scanner/snmp/snmp_login</code> tries a wordlist
+to guess the community string</li>
+</ul>
+
+<h3 id="writing-a-custom-scanner">Writing a Custom Scanner</h3>
+
+<ul>
+<li>Mixins offered by Metasploit are pre-defined code</li>
+<li>Written in ruby</li>
+<li>If saved in <code>modules/auxiliary/scanner/http</code> as
+simple_tcp.rb, call using <code>use
+auxiliary/scanner/simple_tcp</code></li>
+</ul>
+
+<h1 id="chapter-4-vulnerability-scanning">Chapter 4: Vulnerability Scanning</h1>
+
+<ul>
+<li>Vulnerability scanner is an automated program
+designed to look for weaknesses in computers, systems,
+networks, and applications</li>
+<li>Sends data and analyzes responses</li>
+</ul>
+
+<h3 id="the-basic-vulnerability-scan">The Basic Vulnerability Scan</h3>
+
+<ul>
+<li>Banner grabbing = connecting and reading service
+identification</li>
+<li><code>nc 192.168.1.203 80</code></li>
+</ul>
+
+<h2 id="scanning-with-nexpose">Scanning with NeXpose</h2>
+
+<ul>
+<li>Developed by Rapid7 (owner of Metasploit)</li>
+<li>Community and commercial editions available</li>
+</ul>
+
+<h3 id="configuration">Configuration</h3>
+
+<ul>
+<li>Install NeXpose</li>
+<li>Navigate to <em>https://<youripaddress>:3780</em></li>
+<li>Accept self-signed certificate</li>
+<li>Login</li>
+<li>Tabs:
+<ul>
+<li>Assets: displays details of scans</li>
+<li>Reports: vulnerability reports after they have been
+generated</li>
+<li>Vulnerabilities: details on vulnerabilities discovered
+during scan</li>
+<li>Administration: configuration</li>
+</ul></li>
+</ul>
+
+<h3 id="the-new-site-wizard">The New Site Wizard</h3>
+
+<ul>
+<li>Click <strong>New Site</strong> on homepage</li>
+<li>Add device IPs, click <strong>Next</strong></li>
+<li>Select scan templates, click <strong>Next</strong></li>
+<li>Add credentials if you have them</li>
+<li>Verify credentials using <strong>New Login</strong> and
+<strong>Test Login</strong></li>
+</ul>
+
+<h3 id="the-new-manual-scan-wizard">The New Manual Scan Wizard</h3>
+
+<ul>
+<li>Click <strong>New Manual Scan</strong></li>
+<li>Double-check the IP address, then click <strong>Start Now</strong></li>
+<li>NeXpose will now run the scan</li>
+<li>Wait until both Scan Progress and Discovered Assets
+show <em>Completed</em></li>
+</ul>
+
+<h3 id="the-new-report-wizard">The New Report Wizard</h3>
+
+<ul>
+<li>Click <strong>New Report</strong> in the Reports tab</li>
+<li>Select <strong>NeXpose Simple XML Export</strong> for compatibility
+with Metasploit, click <strong>Next</strong></li>
+<li>Add included devices using <strong>Select Sites</strong>, then
+<strong>Save</strong></li>
+</ul>
+
+<h3 id="importing-your-report-into-metasploit-framework">Importing Your Report into Metasploit Framework</h3>
+
+<ul>
+<li>Create a new database:
+<ul>
+<li><code>db_connect postgres:toor@127.0.0.1/msf3</code></li>
+</ul></li>
+<li>Import NeXpose XML:
+<ul>
+<li><code>db_import /tmp/host_195.xml</code></li>
+</ul></li>
+<li>Test:
+<ul>
+<li><code>db_hosts -c address,svcs, vulns</code></li>
+<li><code>db_vulns</code></li>
+</ul></li>
+</ul>
+
+<h3 id="running-nexpose-within-msfconsole">Running NeXpose Within MSFconsole</h3>
+
+<ul>
+<li>Delete existing database: <code>db_destroy
+postgres:toor@127.0.0.1/msf3</code></li>
+<li>Create a new database: <code>db_connect
+postgres:toor@127.0.0.1/msf3</code></li>
+<li>Load NeXpose plugin: <code>load nexpose</code></li>
+<li>Connect to local NeXpose install:
+<code>nexpose_connect</code></li>
+<li>Initiate scan: <code>nexpose_scan 192.168.1.195</code></li>
+<li>Check with <code>db_hosts -c address</code> and <code>db_vulns</code></li>
+</ul>
+
+<h2 id="scanning-with-nessus">Scanning with Nessus</h2>
+
+<ul>
+<li>Developed by Tenable Security</li>
+</ul>
+
+<h3 id="nessus-configuration">Nessus Configuration</h3>
+
+<ul>
+<li>After installation, navigate to
+<em>https://<youripaddress>:8834</em></li>
+<li>Accept certificate warning</li>
+<li>Log into Nessus</li>
+</ul>
+
+<h3 id="creating-a-nessus-scan-policy">Creating a Nessus Scan Policy</h3>
+
+<ul>
+<li>In Policies tab, click <strong>Add</strong> button</li>
+<li>This is seriously intuitive and obvious, so I'll skip
+the rest of these instructions</li>
+</ul>
+
+<h3 id="running-a-nessus-scan">Running a Nessus Scan</h3>
+
+<ul>
+<li>Go to <strong>Scans</strong> tab, click <strong>Add</strong></li>
+<li>Edit options, then click <strong>Launch Scan</strong></li>
+</ul>
+
+<h3 id="nessus-reports">Nessus Reports</h3>
+
+<ul>
+<li>After a scan is complete it becomes a new entry
+in the Reports tab</li>
+<li>Find a report and click <strong>Browse</strong></li>
+</ul>
+
+<h3 id="importing-results-into-the-metasploit-framework">Importing Results into the Metasploit Framework</h3>
+
+<ul>
+<li>Click <strong>Download Report</strong> in Reports tab</li>
+<li>Select default (.nessus) file format</li>
+<li><code>db_connect postgres:toor@127.0.0.1/msf3</code></li>
+<li><code>db_import /tmp/nessus_report_Host_195.nessus</code></li>
+<li><code>db_hosts -c address,svcs,vulns</code></li>
+<li><code>db_vulns</code></li>
+</ul>
+
+<h3 id="scanning-with-nessus-from-within-metasploit">Scanning with Nessus from Within Metasploit</h3>
+
+<ul>
+<li>Nessus Bridge plugin by Zate</li>
+<li><code>db_destroy postgres:toor@127.0.0.1/msf3</code></li>
+<li><code>db_connect postgres:toor@127.0.0.1/msf3</code></li>
+<li><code>load nessus</code></li>
+<li><code>nessus_help</code></li>
+<li><code>nessus_connect dookie:s3cr3t@192.168.1.101:8834</code> to
+authenticate</li>
+<li><code>nessus_policy_list</code></li>
+<li><code>nessus_scan_new</code></li>
+<li><code>nessus_scan_new 2 bridge_scan 192.168.1.195</code></li>
+<li><code>nessus_scan_status</code></li>
+<li><code>nessus_report_list</code></li>
+<li><code>nessus_report_get</code> to import report into database</li>
+</ul>
+
+<h2 id="specialty-vulnerability-scanners">Specialty Vulnerability Scanners</h2>
+
+<h3 id="validating-smb-logins">Validating SMB Logins</h3>
+
+<ul>
+<li>SMB Login Check Scanner</li>
+<li>Loud and noticeable, shows in Windows logs</li>
+<li><code>use smb_login</code></li>
+<li><code>show_options</code></li>
+</ul>
+
+<h3 id="scanning-for-open-vnc-authentication">Scanning for Open VNC Authentication</h3>
+
+<ul>
+<li>Virtual network computing (VNC) = graphical access
+to remote system</li>
+<li>Old versions leave default password blank</li>
+<li>VNC Authentication None scanner</li>
+<li><code>use auxiliary/scanner/vnc/vnc_none_auth</code></li>
+<li>Use vncviewer to connect</li>
+</ul>
+
+<h3 id="scanning-for-open-x11-servers">Scanning for Open X11 Servers</h3>
+
+<ul>
+<li>open_x11 scanner</li>
+<li>X11 not widely used nowadays</li>
+<li>xspy tool to exploit X11 vulnerabilities</li>
+</ul>
+
+<h3 id="using-scan-results-for-autopwning">Using Scan Results for Autopwning</h3>
+
+<ul>
+<li>Autopwn tool automatically targets and exploits a
+system using an open port or results of a vuln scan</li>
+<li>Create new Metasploit database</li>
+<li>Import a scan report to the database</li>
+<li><code>db_autopwn -etrxp</code>
+<ul>
+<li>e: all targets</li>
+<li>t: show all matching modules</li>
+<li>r: reverse shell payload</li>
+<li>x: select exploit modules based on vulnerability</li>
+<li>p: select exploit modules based on open ports</li>
+</ul></li>
+<li>Successful exploit returns a shell to the attacking
+machine</li>
+<li><code>db_autopwn -h</code> for help</li>
+</ul>
+
+<h1 id="chapter-5-the-joy-of-exploitation">Chapter 5: The Joy of Exploitation</h1>
+
+<ul>
+<li>We'll be using msfconsole, msfencode, and msfpayload</li>
+</ul>
+
+<h2 id="basic-exploitation">Basic Exploitation</h2>
+
+<ul>
+<li>Running <code>show</code> from msfconsole will display every
+available module</li>
+</ul>
+
+<h3 id="msf-show-exploits">msf> show exploits</h3>
+
+<ul>
+<li>Exploits operate against vulnerabilities discovered
+during a penetration test</li>
+</ul>
+
+<h3 id="msf-show-auxiliary">msf> show auxiliary</h3>
+
+<ul>
+<li>Auxiliary modules used for scanning, DoS, fuzzers,
+etc.</li>
+</ul>
+
+<h3 id="msf-show-options">msf> show options</h3>
+
+<ul>
+<li>Shows module options when one is selected</li>
+<li>Otherwise shows global options</li>
+<li>Use <code>back</code> command to exit a module</li>
+<li>Use <code>search</code> to find a specific attack, auxiliary
+module, or payload</li>
+</ul>
+
+<h3 id="msf-show-payloads">msf> show payloads</h3>
+
+<ul>
+<li>Payload = platform-specific portion of code
+delivered to a target</li>
+<li>If module is selected, this command shows only
+compatible payloads</li>
+<li>If running an exploit, it shows only payloads
+applicable to the attack</li>
+<li><code>set payload &lt;name&gt;</code></li>
+<li><code>show options</code></li>
+</ul>
+
+<h3 id="msf-show-targets">msf> show targets</h3>
+
+<ul>
+<li>When module selected, shows vulnerable potential
+targets compatible with it</li>
+<li>Automatic targeting isn't always the best idea because
+it might crash the system or simply not work if it's
+wrong</li>
+</ul>
+
+<h3 id="info">info</h3>
+
+<ul>
+<li>Gets detailed information about a module</li>
+</ul>
+
+<h3 id="set-and-unset">set and unset</h3>
+
+<ul>
+<li><code>set</code> to set an option</li>
+<li><code>unset</code> to turn off a setting</li>
+</ul>
+
+<h3 id="setg-and-unsetg">setg and unsetg</h3>
+
+<ul>
+<li>Same as set and unset, but operate on global settings</li>
+</ul>
+
+<h3 id="save">save</h3>
+
+<ul>
+<li>Saves global settings</li>
+</ul>
+
+<h2 id="exploiting-your-first-machine">Exploiting Your First Machine</h2>
+</body>
+</html>

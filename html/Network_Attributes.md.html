@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/*********************************************************************
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+For more information, please refer to <http://unlicense.org/>
+*********************************************************************/
+
+/*
+WiTeX
+https://github.com/AndrewBelt/WiTeX
+*/
+
+
+/* Latin Modern (LaTeX default) font */
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: normal;
+	src: url('fonts/lmroman10-regular.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: normal;
+	src: url('fonts/lmroman10-bold.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: italic;
+	src: url('fonts/lmroman10-italic.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: italic;
+	src: url('fonts/lmroman10-bolditalic.woff') format('woff');
+}
+
+/* Page Layout */
+
+body {
+  background-color: white;
+  font-size: 15pt;
+}
+
+body {
+	font-family: 'Latin Modern Roman', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	border: none;
+	font-weight: bold;
+}
+
+a, a:visited {
+	color: #a00;
+}
+
+ul {
+	list-style: disc;
+}
+
+/* Content Box */
+
+.content {
+	max-width: 720px;
+	margin: 2em auto;
+}
+
+.content > h1:first-child {
+	text-align: center;
+	display: block;
+}
+
+/* Article Body */
+
+.content {
+	text-align: justify;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+}
+
+dl dd {
+	/* center definitions (most useful for display equations) */
+	text-align: center;
+}
+
+code {
+	border-radius: 3px;
+	background-color: black;
+	color: white;
+	padding: 2px 3px;
+}
+</style>
+
+</head>
+<body>
+<ul>
+  <li><a href="#notes">Notes</a></li>
+  <li><a href="#mac-address">MAC address</a>
+  <ul>
+    <li><a href="#changing-your-mac-address">Changing your MAC address</a></li>
+  </ul></li>
+  <li><a href="#80211-nickname">802.11 "Nickname"</a></li>
+  <li><a href="#dhcp-properties">DHCP Properties</a>
+  <ul>
+    <li><a href="#hiding-revealing-information">Hiding revealing information</a></li>
+  </ul></li>
+  <li><a href="#ip-address">IP Address</a>
+  <ul>
+    <li><a href="#proxy-hopping">Proxy hopping</a></li>
+    <li><a href="#ssh-hopping">SSH Hopping</a></li>
+  </ul></li>
+</ul>
+<h1 id="notes">Notes</h1>
+
+<p>This is a WIP</p>
+
+<h1 id="mac-address">MAC address</h1>
+
+<ul>
+<li>Every 802.x card has one.</li>
+<li>48-bit integer</li>
+<li>Networking equipment remembers this address after an authentication</li>
+<li>It figures in unpurgeable logs, ISP logs, manufacturer logs, etc.</li>
+<li>Spoofing your MAC address requests a new IP from your ISP, acting like
+an IP address reset</li>
+<li>MAC is confined to the LAN</li>
+</ul>
+
+<h3 id="changing-your-mac-address">Changing your MAC address</h3>
+
+<p><strong>Linux:</strong></p>
+
+<pre><code>ifconfig eth0 down
+macchanger -r eth0
+ifconfig eth0 up
+</code></pre>
+
+<p><strong>Windows:</strong>
+Find yer own tools</p>
+
+<h1 id="80211-nickname">802.11 "Nickname"</h1>
+
+<p><strong>Linux:</strong></p>
+
+<pre><code>iwconfig ath0 nickname "Anon"
+</code></pre>
+
+<p><strong>Windows:</strong>
+Change machine hostname: modify registry or find other means</p>
+
+<h1 id="dhcp-properties">DHCP Properties</h1>
+
+<ul>
+<li>Used when obtaining an IP address</li>
+<li>Includes hostname, MAC address, sometimes OS info and DHCP version</li>
+<li>Compromises anonimity in LAN</li>
+<li>Provides most recent IP address to DHCP server</li>
+<li>You must therefore wipe out previous IP leases</li>
+</ul>
+
+<h3 id="hiding-revealing-information">Hiding revealing information</h3>
+
+<p><strong>Linux:</strong>
+Varies between distros, but DHCP info is often read from
+<code>/etc/dhclient-interface.conf</code></p>
+
+<p>Change <code>/etc/init.d/net.eth0</code> file or its equivalent to</p>
+
+<pre><code>VID=`fortune -o|head -c 30|tr "\"'\n" ' ' 2&gt;/dev/null`
+/sbin/dhcpcd -i ${VID} ${dhcpcd_IFACE} ${IFACE}
+</code></pre>
+
+<p>Previous IPs found in <code>/var/lib/dhcp/</code> -> do this between restarts:</p>
+
+<pre><code>/sbin/ifdown ethN ;
+[change mac addr] ;
+[change hostname] ;
+rm /var/lib/dhcp/* ;
+/sbin/ifup ethN ;
+</code></pre>
+
+<p><strong>Windows:</strong>
+Change your hostname to something that won't identify you
+(through registry or other means)</p>
+
+<pre><code>ipconfig /release
+ipconfig /renew
+</code></pre>
+
+<h1 id="ip-address">IP Address</h1>
+
+<h3 id="proxy-hopping">Proxy hopping</h3>
+
+<ul>
+<li>Not very effective unless done exactly right with exactly the right
+proxies</li>
+<li>Find proxies that don't report your IP address in the form of
+a cookie/session variable to hosts</li>
+<li>The above issue can tested through various checkers</li>
+<li>It's possible to chain multiple proxies together</li>
+</ul>
+
+<h3 id="ssh-hopping">SSH Hopping</h3>
+
+<p>*</p>
+</body>
+</html>

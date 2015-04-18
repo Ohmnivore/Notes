@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/*********************************************************************
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+For more information, please refer to <http://unlicense.org/>
+*********************************************************************/
+
+/*
+WiTeX
+https://github.com/AndrewBelt/WiTeX
+*/
+
+
+/* Latin Modern (LaTeX default) font */
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: normal;
+	src: url('fonts/lmroman10-regular.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: normal;
+	src: url('fonts/lmroman10-bold.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: normal;
+	font-style: italic;
+	src: url('fonts/lmroman10-italic.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Latin Modern Roman';
+	font-weight: bold;
+	font-style: italic;
+	src: url('fonts/lmroman10-bolditalic.woff') format('woff');
+}
+
+/* Page Layout */
+
+body {
+  background-color: white;
+  font-size: 15pt;
+}
+
+body {
+	font-family: 'Latin Modern Roman', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	border: none;
+	font-weight: bold;
+}
+
+a, a:visited {
+	color: #a00;
+}
+
+ul {
+	list-style: disc;
+}
+
+/* Content Box */
+
+.content {
+	max-width: 720px;
+	margin: 2em auto;
+}
+
+.content > h1:first-child {
+	text-align: center;
+	display: block;
+}
+
+/* Article Body */
+
+.content {
+	text-align: justify;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
+}
+
+dl dd {
+	/* center definitions (most useful for display equations) */
+	text-align: center;
+}
+
+code {
+	border-radius: 3px;
+	background-color: black;
+	color: white;
+	padding: 2px 3px;
+}
+</style>
+
+</head>
+<body>
+<ul>
+  <li><a href="#preface">Preface</a>
+  <ul>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+  </ul></li>
+  <li><a href="#part-1-foundation">Part 1: Foundation</a></li>
+  <li><a href="#chapter-1-empty-cup-mind">Chapter 1: Empty Cup Mind</a>
+  <ul>
+    <li><a href="#droppers">Droppers</a></li>
+  </ul></li>
+  <li><a href="#infectious-agents">Infectious Agents</a>
+  <ul>
+    <li><a href="#rise-of-the-botnets">Rise of the Botnets</a></li>
+    <li><a href="#enter-conficker">Enter: Conficker</a></li>
+    <li><a href="#malware-versus-rootkits">Malware Versus Rootkits</a></li>
+    <li><a href="#who-is-building-and-using-rootkits">Who Is Building and Using Rootkits</a></li>
+    <li><a href="#who-builds-state-of-the-art-rootkits">Who Builds State-of-the-Art Rootkits?</a></li>
+  </ul></li>
+  <li><a href="#chapter-2-overview-of-anti-forensics">Chapter 2: Overview of Anti-Forensics</a>
+  <ul>
+    <li><a href="#incident-response">Incident Response</a>
+    <ul>
+      <li><a href="#intrusion-detection-system">Intrusion Detection System</a></li>
+    </ul></li>
+    <li><a href="#computer-forensics">Computer Forensics</a></li>
+    <li><a href="#why-af">Why AF?</a>
+    <ul>
+      <li><a href="#classifying-forensic-techniques-first-method">Classifying Forensic Techniques: First Method</a></li>
+      <li><a href="#classifying-forensic-techniques-second-method">Classifying Forensic Techniques: Second Method</a></li>
+      <li><a href="#live-response">Live Response</a></li>
+      <li><a href="#when-powering-down-isnt-an-option">When Powering Down Isn't an Option</a></li>
+      <li><a href="#the-debate-over-pulling-the-plug">The Debate over Pulling the Plug</a></li>
+      <li><a href="#to-crash-dump-or-not-to-crash-dump">To Crash Dump or Not to Crash Dump</a></li>
+      <li><a href="#postmortem-analysis">Postmortem Analysis</a></li>
+    </ul></li>
+    <li><a href="#af-strategies">AF Strategies</a>
+    <ul>
+      <li><a href="#data-destruction">Data Destruction</a></li>
+      <li><a href="#data-concealment">Data Concealment</a></li>
+      <li><a href="#data-transformation">Data transformation</a></li>
+      <li><a href="#data-fabrication">Data Fabrication</a></li>
+      <li><a href="#data-source-elimination">Data Source Elimination</a></li>
+    </ul></li>
+    <li><a href="#general-advice-for-af-techniques">General Advice for AF Techniques</a>
+    <ul>
+      <li><a href="#use-custom-tools">Use Custom Tools</a></li>
+      <li><a href="#low-and-slow-versus-scorched-earth">Low and Slow versus Scorched Earth</a></li>
+      <li><a href="#shun-instance-specific-attacks">Shun Instance-Specific Attacks</a></li>
+      <li><a href="#use-a-layered-defense">Use a Layered Defense</a></li>
+    </ul></li>
+    <li><a href="#john-doe-has-the-upper-hand">John Doe Has the Upper Hand</a>
+    <ul>
+      <li><a href="#attackers-can-focus-on-attacking">Attackers Can Focus on Attacking</a></li>
+      <li><a href="#defenders-face-institutional-challenges">Defenders Face Institutional Challenges</a></li>
+      <li><a href="#security-is-a-boring-process">Security Is a Boring Process</a></li>
+      <li><a href="#ever-increasing-complexity">Ever-Increasing Complexity</a></li>
+    </ul></li>
+    <li><a href="#conclusions">Conclusions</a></li>
+  </ul></li>
+  <li><a href="#chapter-3-hardware-briefing">Chapter 3: Hardware Briefing</a>
+  <ul>
+    <li><a href="#physical-memory">Physical Memory</a></li>
+    <li><a href="#ia-32-memory-models">IA-32 Memory Models</a>
+    <ul>
+      <li><a href="#flat-memory-model">Flat memory model</a></li>
+      <li><a href="#segmented-memory-model">Segmented Memory Model</a></li>
+      <li><a href="#modes-of-operation">Modes of Operation</a></li>
+    </ul></li>
+    <li><a href="#real-mode">Real Mode</a>
+    <ul>
+      <li><a href="#case-study-ms-dos">Case Study: MS-DOS</a></li>
+      <li><a href="#why-study-real-mode">Why Study Real Mode?</a></li>
+      <li><a href="#the-real-mode-execution-environment">The Real-Mode Execution Environment</a></li>
+      <li><a href="#real-mode-interrupts">Real-Mode Interrupts</a></li>
+      <li><a href="#segmentation-and-program-control">Segmentation and Program Control</a></li>
+      <li><a href="#case-study-dumping-the-ivt">Case Study: Dumping the IVT</a></li>
+      <li><a href="#case-study-logging-keystrokes-with-a-tsr">Case Study: Logging Keystrokes with a TSR</a></li>
+    </ul></li>
+  </ul></li>
+</ul>
+<h1 id="preface">Preface</h1>
+
+<ul>
+<li>Part 1: Core framework</li>
+<li>Part 2: Postmortem forensics</li>
+<li>Part 3: Live response</li>
+<li>Part 4: Summation</li>
+</ul>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+<li>C</li>
+<li>Intel assembly</li>
+</ul>
+
+<h1 id="part-1-foundation">Part 1: Foundation</h1>
+
+<h1 id="chapter-1-empty-cup-mind">Chapter 1: Empty Cup Mind</h1>
+
+<ul>
+<li>Rootkit = kit for maintaining root privileges</li>
+<li>Attack cycle
+<ul>
+<li>Information gathering</li>
+<li>Gain access to a command interface</li>
+<li>Escalate rights</li>
+<li>Deploy rootkit</li>
+<li>Command and Control</li>
+</ul></li>
+<li>Pivoting: using other machines in a compromised network</li>
+</ul>
+
+<h3 id="droppers">Droppers</h3>
+
+<ul>
+<li>Exploit -> payload -> dropper -> installation</li>
+<li>Multi-stage dropper: downloads the rootkit instead
+of being bundled with it</li>
+<li>Rootkit = tool that hides itself and other process/data/
+activity on a system
+<ul>
+<li>Used for concealment</li>
+<li>Command and control (C2)</li>
+<li>Surveillance</li>
+</ul></li>
+<li>Good rootkits are designed to stay secret, so the admin
+will never notice them</li>
+</ul>
+
+<h2 id="infectious-agents">Infectious Agents</h2>
+
+<ul>
+<li>Viruses
+<ul>
+<li>Need to be actively executed by the user</li>
+<li>Infects other files</li>
+<li>Ex: disquette boot sector, email attachments, browser-
+based ActiveX, warez</li>
+</ul></li>
+<li>Worms
+<ul>
+<li>In contrast to viruses, they spread automatically</li>
+<li>Ex: Morris Worm</li>
+</ul></li>
+<li>Adware
+<ul>
+<li>Displays ads when executed or installed</li>
+<li>Ex: Eudora back in the day</li>
+</ul></li>
+<li>Spyware
+<ul>
+<li>Collects information about the user without consent</li>
+<li>Ex: Hotbar</li>
+</ul></li>
+</ul>
+
+<h3 id="rise-of-the-botnets">Rise of the Botnets</h3>
+
+<ul>
+<li>Collection of compromised machines</li>
+<li>Controlled remotely by someone</li>
+<li>Command and control servers (C2) used to control: IRC
+or web servers with high bandwidth</li>
+<li>Bot software usually delivered as a payload within
+malware</li>
+<li>Botnets can send spam, phishing scams, DDoS attacks,
+etc.</li>
+<li>150 million of the 600 million computers connected to
+the Internet belong to a botnet</li>
+<li>In 2005 the Netherlands police uncovered a botnet
+consisting of 1.5 million machines</li>
+</ul>
+
+<h3 id="enter-conficker">Enter: Conficker</h3>
+
+<ul>
+<li>Botnet with 10 million infected hosts</li>
+<li>Microsoft offered $250,000 reward for information about
+its authors</li>
+</ul>
+
+<h3 id="malware-versus-rootkits">Malware Versus Rootkits</h3>
+
+<ul>
+<li>Rootkits are solely concerned with sustaining covert
+access to a machine, not self-propagation for example</li>
+<li>Rootkits can be fused with malware as a <em>force
+multiplier</em></li>
+</ul>
+
+<h3 id="who-is-building-and-using-rootkits">Who Is Building and Using Rootkits</h3>
+
+<ul>
+<li>Data is the new currency</li>
+<li>Marketing</li>
+<li>Digital Rights Management (DRM enforcing, <em>cough,
+cough, SONY, cough cough</em>)</li>
+<li>Rootkits as features, ex: Symantec's SystemWorks</li>
+<li>Law enforcement, ex: Magic Lantern</li>
+<li>Industrial Espionage</li>
+<li>Political Espionage</li>
+<li>Cybercrime</li>
+</ul>
+
+<h3 id="who-builds-state-of-the-art-rootkits">Who Builds State-of-the-Art Rootkits?</h3>
+
+<ul>
+<li>Intelligence agencies</li>
+</ul>
+
+<h1 id="chapter-2-overview-of-anti-forensics">Chapter 2: Overview of Anti-Forensics</h1>
+
+<ul>
+<li>Goal of AF is to minimize the quantity and quality of
+useful trace evidence</li>
+<li>Rootkits and AF go hand in hand</li>
+<li>Sometimes the point isn't to erase all traces, but to
+make it difficult and expensive to find them</li>
+</ul>
+
+<h2 id="incident-response">Incident Response</h2>
+
+<ul>
+<li>IR = emergency response for suspicious computer events</li>
+</ul>
+
+<h3 id="intrusion-detection-system">Intrusion Detection System</h3>
+
+<ul>
+<li>IDS = unared, off-duty cop doing a security guard
+night shift</li>
+<li>Sounds the alarm when something's suspicious</li>
+<li>Two types
+<ul>
+<li>HIDS: host-based, scans for malware locally</li>
+<li>NIDS: sits on the network, scans packets</li>
+</ul></li>
+<li>Intrusion prevention system is like an IDS, but it
+takes action once it detects a threat</li>
+</ul>
+
+<h2 id="computer-forensics">Computer Forensics</h2>
+
+<p>Goals:
+* Identify attacker
+* Identify what the attacker did
+* When the attack happened
+* How the attack was carried out
+* Why the attack was carried out</p>
+
+<h2 id="why-af">Why AF?</h2>
+
+<p>Lots of sys admins will just nuke a compromised machine:
+* Shut down
+* Flash firmware
+* Wipe drive
+* Rebuild from a prepared disk image</p>
+
+<p><strong>BUT</strong> forensic analysis can also be used
+<em>preemptively</em></p>
+
+<h3 id="classifying-forensic-techniques-first-method">Classifying Forensic Techniques: First Method</h3>
+
+<ul>
+<li>Data can reside locally, on a remote machine, or on the
+network</li>
+<li>Volumes -> file systems (ex: NTFS, FAT) -> files ->
+type of file (executable, text-based, config, etc.)</li>
+</ul>
+
+<h3 id="classifying-forensic-techniques-second-method">Classifying Forensic Techniques: Second Method</h3>
+
+<ul>
+<li>The order of volatility
+<ul>
+<li>"When collecting evidence you should proceed from
+the volatile to the less volatile"</li>
+</ul></li>
+<li>Locard's exchange principle: "every contact leaves a
+trace", the very act of collecting data can disturb the
+crime scene</li>
+</ul>
+
+<h3 id="live-response">Live Response</h3>
+
+<ul>
+<li>Often involves dumping the contents of the memory</li>
+<li>Volatile data = information that will be lost if the
+machine lost power</li>
+<li>Port scans can be performed</li>
+<li>Process memory images</li>
+</ul>
+
+<h3 id="when-powering-down-isnt-an-option">When Powering Down Isn't an Option</h3>
+
+<ul>
+<li>To create a crash dump or not? That is the question.</li>
+<li>Keep the machine on to monitor the intruder?</li>
+</ul>
+
+<h3 id="the-debate-over-pulling-the-plug">The Debate over Pulling the Plug</h3>
+
+<ul>
+<li>Normal shutdown vs yanking the power cable or battery</li>
+<li>Shutting down = less risk of corrupting the file system
+<ul>
+<li>But it allows shutdown scripts and the like to run
+so an attacker can cover his tracks</li>
+</ul></li>
+<li>Some attackers can shut down the machine themselves
+to destroy evidence, so yanking the power can avoid that</li>
+</ul>
+
+<h3 id="to-crash-dump-or-not-to-crash-dump">To Crash Dump or Not to Crash Dump</h3>
+
+<ul>
+<li>Crash dumps offer insight into the system's internal
+structures</li>
+<li>Kernel debuggers</li>
+<li>Crash dumps are disruptive if saved to the same drive
+that is being investigated</li>
+</ul>
+
+<h3 id="postmortem-analysis">Postmortem Analysis</h3>
+
+<ul>
+<li>BIOS and PCI-RIM snapshots can be taken for analysis</li>
+</ul>
+
+<h2 id="af-strategies">AF Strategies</h2>
+
+<p>f = file, fs = filesystem
+* Data destruction: f scrubbing, fs attacks
+* Data conceilment: in-band, out-of-band, app layer
+conceilment
+* Data transformation: compression, encryption,
+code morphing, direct edits
+* Data fabrication: introduce known files, string
+decoration, false audit trails
+* Data source elimination: data contraception, custom
+module loaders</p>
+
+<ul>
+<li>Buy time with data source elimination and data
+destruction</li>
+<li>Leave difficult to capture and understand evidence
+with data conceilment and data transformation</li>
+<li>Plant misinformation and decoy investigation paths
+with data fabrication</li>
+</ul>
+
+<h3 id="data-destruction">Data Destruction</h3>
+
+<ul>
+<li>Ex: wiping memory buffers used by a program,
+repeated overwriting</li>
+<li>Data transformation can be used for data destruction</li>
+<li>Dissolving batch file</li>
+<li>In Windows, a binary can't delete itself, but can
+make an executable to do that on its behalf</li>
+</ul>
+
+<h3 id="data-concealment">Data Concealment</h3>
+
+<ul>
+<li>Storing data in a manner that it's not likely to be
+found</li>
+<li>Security through obscurity</li>
+<li>Only works on the short term</li>
+<li>Ex: storing files in the System Volume Information
+folder</li>
+<li>Active conceilment = modifying host operating system
+after launch</li>
+</ul>
+
+<h3 id="data-transformation">Data transformation</h3>
+
+<ul>
+<li>Ex: steganography, ciphers, encryption</li>
+<li>Armoring: rootkit is stored as an encrypted executable
+that decrypts itself at runtime</li>
+<li>English shellcode: conceil machine instructions as
+ASCII text</li>
+</ul>
+
+<h3 id="data-fabrication">Data Fabrication</h3>
+
+<ul>
+<li>Generate false positives and bogus leads</li>
+<li>Buys time</li>
+</ul>
+
+<h3 id="data-source-elimination">Data Source Elimination</h3>
+
+<ul>
+<li>Don't rely on the targeted system
+<ul>
+<li>ex: not registered for execution by the kernel</li>
+</ul></li>
+</ul>
+
+<h2 id="general-advice-for-af-techniques">General Advice for AF Techniques</h2>
+
+<h3 id="use-custom-tools">Use Custom Tools</h3>
+
+<ul>
+<li>Metasploit and UPX are awesome, but they've already
+been analyzed to death</li>
+</ul>
+
+<h3 id="low-and-slow-versus-scorched-earth">Low and Slow versus Scorched Earth</h3>
+
+<ul>
+<li>The goal of AF is to buy time</li>
+<li>Noisy way:
+<ul>
+<li>Ex: flood the system with malware or a few gigs of
+drivers (divert suspicion from a rootkit)</li>
+<li>However, it alerts the investigator that something
+is wrong</li>
+</ul></li>
+<li>Instead, rootkits should only use those AF tools
+that are conducive to sustaining a minimal profile</li>
+<li>Don't raise any red flags</li>
+</ul>
+
+<h3 id="shun-instance-specific-attacks">Shun Instance-Specific Attacks</h3>
+
+<ul>
+<li>A skilled forensic investigator doesn't limit himself
+to his tools</li>
+</ul>
+
+<h3 id="use-a-layered-defense">Use a Layered Defense</h3>
+
+<ul>
+<li>We assume that forensic tools are being deployed
+preemptively</li>
+<li>Make automation as hard as possible</li>
+</ul>
+
+<h2 id="john-doe-has-the-upper-hand">John Doe Has the Upper Hand</h2>
+
+<ul>
+<li>Black Hats have the upper hand for now</li>
+</ul>
+
+<h3 id="attackers-can-focus-on-attacking">Attackers Can Focus on Attacking</h3>
+
+<ul>
+<li>Attackers have only one concern: breaking in</li>
+<li>Defenders have the hurdle of the business aspect</li>
+</ul>
+
+<h3 id="defenders-face-institutional-challenges">Defenders Face Institutional Challenges</h3>
+
+<ul>
+<li>Investigators often mired by bureaucracy</li>
+</ul>
+
+<h3 id="security-is-a-boring-process">Security Is a Boring Process</h3>
+
+<h3 id="ever-increasing-complexity">Ever-Increasing Complexity</h3>
+
+<ul>
+<li>New versions of operating systems aren't becoming more
+secure</li>
+<li>Old dependencies remain security flaws</li>
+<li>TL;DR Microsoft is shit at patching vulnerabilities</li>
+</ul>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<ul>
+<li>AF
+<ul>
+<li>Leave behind as little useful evidence as possible</li>
+<li>Make the evidence that remains difficult to capture
+and understand</li>
+<li>Plant misinformation</li>
+</ul></li>
+<li>Rootkits are a subset of AF that rely on low-and-slow
+strategies
+<ul>
+<li>Provide remote access</li>
+<li>Provide monitoring</li>
+<li>Provide concealment</li>
+</ul></li>
+<li>Rootkit architecture:
+<ul>
+<li>What part of the system it interfaces with</li>
+<li>Where the rootkit will reside</li>
+</ul></li>
+</ul>
+
+<h1 id="chapter-3-hardware-briefing">Chapter 3: Hardware Briefing</h1>
+
+<ul>
+<li>For writing rootkits, one must choose the Windows
+execution mode(s) to use</li>
+</ul>
+
+<h2 id="physical-memory">Physical Memory</h2>
+
+<ul>
+<li>IA-32 processor family -> accesses bytes (8 bits)
+using a unique <em>physical address</em> (an integer)</li>
+<li>Physical address range = <em>physical address space</em></li>
+<li>Physical addresses start at 0 and increment by 1</li>
+<li>Low memory: addresses near 0</li>
+<li>High memory: addresses near the final byte</li>
+<li>Control bus and data bus to r/w physical memory</li>
+<li>Read operation steps:
+<ul>
+<li>Processor places address to be read on the address
+lines</li>
+<li>Processor send the read signal to the control bus</li>
+<li>RAM chips return the byte on the data bus</li>
+</ul></li>
+<li>Write operation steps:
+<ul>
+<li>Processor places the address to be written on the
+address lines</li>
+<li>Processor send the write signal on the control bus</li>
+<li>Processor sends the byte to be written on the data bus</li>
+</ul></li>
+<li>IA-32 r/w 4 bytes at a time</li>
+</ul>
+
+<h2 id="ia-32-memory-models">IA-32 Memory Models</h2>
+
+<h3 id="flat-memory-model">Flat memory model</h3>
+
+<ul>
+<li>Abstraction</li>
+<li>Memory = contiguous sequence of bytes
+<ul>
+<li>Addressed starting from 0</li>
+<li>Ending at arbitrary value <em>N</em>, 2^32 - 1 in IA-32</li>
+</ul></li>
+<li>Address of a byte = <em>linear address</em></li>
+<li>Range of possible bytes = <em>linear address space</em></li>
+<li>Similar to physical memory, only difference is that
+it's at a higher level of abstraction</li>
+</ul>
+
+<h3 id="segmented-memory-model">Segmented Memory Model</h3>
+
+<ul>
+<li>Regions of memory, aka segments</li>
+<li>Byte of an address = <em>logical address</em></li>
+<li>Logical address consists of:
+<ul>
+<li><em>Segment selector</em></li>
+<li><em>Effective address/Offset address</em>: position of byte
+in the segment</li>
+</ul></li>
+</ul>
+
+<h3 id="modes-of-operation">Modes of Operation</h3>
+
+<ul>
+<li>Modes
+<ul>
+<li>Real mode</li>
+<li>Protected mode</li>
+<li>System management mode</li>
+</ul></li>
+<li>Real mode
+<ul>
+<li>16-bit execution environment</li>
+<li>Old Intel 8086/88 backwards compatibility</li>
+<li>Used on power up</li>
+</ul></li>
+<li>Protected mode:
+<ul>
+<li>Execution environment for system software like Win 7</li>
+</ul></li>
+<li>System management mode (SMM):
+<ul>
+<li>Executes special code embedded in the firmware</li>
+<li>Emergency shutdown</li>
+<li>Power management</li>
+<li>System security</li>
+<li>Etc.</li>
+</ul></li>
+<li>We're interested in real mode and protected mode,
+which use a segmented memory model</li>
+<li>Real mode -> segmentation without protection</li>
+<li>Protected mode -> memory protection facilities</li>
+<li>SMM -> advanced topic, will be discussed later</li>
+</ul>
+
+<h2 id="real-mode">Real Mode</h2>
+
+<ul>
+<li>Segmeneted memory model</li>
+<li>20-bit address space</li>
+<li>Originally used by 8086/88 processors</li>
+<li>Logical address
+<ul>
+<li>16-bit segment selector -> base address of a 64-KB
+memory segment</li>
+<li>16-bit effective address -> offset added to the
+segment selector</li>
+</ul></li>
+<li>Segment address has an implicit 0 added to the end
+<ul>
+<li>0x2000 becomes 0x20000</li>
+</ul></li>
+<li>Processor accesses at most 1MB of physical memory</li>
+<li>No memory protection</li>
+<li>User application can modify the underlying operating
+system</li>
+</ul>
+
+<h3 id="case-study-ms-dos">Case Study: MS-DOS</h3>
+
+<ul>
+<li>First 640 KB of memory = <em>conventional memory</em>
+(system-level code)</li>
+<li>Remaining (up until 1MB) memory = <em>upper memory area</em>
+(UMA) (reserved space for use by hardware)</li>
+<li><em>Upper memory blocks</em> (UMBs) = unused slots in the UMA</li>
+<li>Memory above 1MB is called <em>extended memory</em></li>
+<li><code>mem.exe</code>/<code>mem.exe /d</code> for address space overview</li>
+</ul>
+
+<h3 id="why-study-real-mode">Why Study Real Mode?</h3>
+
+<ul>
+<li>BIOS and boot code operate in real mode</li>
+<li>Real mode lays the basics for protected mode</li>
+</ul>
+
+<h3 id="the-real-mode-execution-environment">The Real-Mode Execution Environment</h3>
+
+<ul>
+<li>16-bit registers:
+<ul>
+<li>6 segment registers</li>
+<li>Store segment selectors</li>
+<li>CS, DS, SS, ES</li>
+<li>4 general registers</li>
+<li>Store numeric operands or address values</li>
+<li>AX, BX, CX, DX</li>
+<li>3 pointer registers</li>
+<li>Store effective addresses</li>
+<li>IP, SP, BP</li>
+<li>2 indexing registers</li>
+<li>Store indexing addressing, string and mathematical
+operations</li>
+<li>SI, DI</li>
+<li>1 FLAGS register</li>
+<li>Store CPU status or result of an operation</li>
+<li>Only 9 bits are used</li>
+<li>TF; bit 8 (trap flag), IF; bit 9 (interrupt enable)</li>
+<li>If TF is 1, single-step interrupt after each
+instruction</li>
+<li>If IF is set, interrupts are acknowledged and
+acted upon</li>
+</ul></li>
+<li>See Table 3.2 (list of registers and their purposes)</li>
+<li>Use <code>debug.exe</code> to view the state of the registers</li>
+</ul>
+
+<h3 id="real-mode-interrupts">Real-Mode Interrupts</h3>
+
+<ul>
+<li><em>Interrupt</em> = event that triggers an <em>interrupt
+service</em> routine (ISR), also known as <em>interrupt handler</em></li>
+<li>First KB of memory (0x00000 to 0x003FF) is occupied
+by the <em>interrupt vector table</em> (IVT) -> <em>interrupt
+descriptor table</em> (IDT) in protected mode</li>
+<li>The IVT and IDT map interrupts to ISRs
+<ul>
+<li>Store a series of <em>interrupt descriptors</em> or
+<em>interrupt vectors</em> in real mode that designate
+the ISR's location in memory</li>
+<li>IVT stores logical address of each ISR sequentially</li>
+<li>At 0x00000 is the effective address of the first
+ISR followed by its segment selector (low byte comes
+first for both)</li>
+<li>Each interrupt takes 4 bytes to store</li>
+<li>Max 256 vectors (0 to 255)</li>
+</ul></li>
+<li>Three types of interrupts:
+<ul>
+<li>Hardware (maskable and nonmaskable)</li>
+<li>Software interrupts</li>
+<li>Exceptions (faults, traps, aborts)</li>
+</ul></li>
+<li>Hardware interrupts
+<ul>
+<li>Generated by external devices and unanticipated</li>
+<li>Maskable = can be disabled by clearing the IF using
+the <code>CLI</code> instruction</li>
+<li>Ex: 8 (system timer), 9 (keyboard)</li>
+<li>Nonmaskable = can't be disabled and CPU always acts on
+it</li>
+<li>Ex: 2</li>
+</ul></li>
+<li>Software interrupts (internal interrupts)
+<ul>
+<li><code>INT [int]</code> instruction</li>
+</ul></li>
+<li>Exception interrupts
+<ul>
+<li>Generated when processor detects an error while
+executing an instruction</li>
+<li>Fault: allows instruction restart, reports at the
+preceding instruction boundary</li>
+<li>Trap: no instruction restart, reports at the
+following instruction boundary</li>
+<li>Abort: the program cannot be restarted</li>
+</ul></li>
+</ul>
+
+<h3 id="segmentation-and-program-control">Segmentation and Program Control</h3>
+
+<ul>
+<li>Real mode uses segmentation to manage memory</li>
+<li>For jump instructions
+<ul>
+<li><code>JMP, CALL, RET, RETF, INT, IRET</code></li>
+<li>near (intrasegment) are within the same segment</li>
+<li>far (intersegment) are within other segments</li>
+<li><code>INT, IRET</code> always far jumps</li>
+<li><code>JMP, CALL</code> near or far depending on context</li>
+<li>can also be direct or indirect (specify destination)
+of jump or not</li>
+</ul></li>
+</ul>
+
+<h3 id="case-study-dumping-the-ivt">Case Study: Dumping the IVT</h3>
+
+<p>Check source code</p>
+
+<h3 id="case-study-logging-keystrokes-with-a-tsr">Case Study: Logging Keystrokes with a TSR</h3>
+</body>
+</html>
