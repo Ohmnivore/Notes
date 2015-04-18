@@ -20,3 +20,10 @@ the GitHub markdown render.
 
 # Notes
 #### [Backtrack 5 Wireless Penetration Testing Beginner's Guide, by Vivek Ramachandran](https://cdn.rawgit.com/Ohmnivore/Notes/master/html/BackTrack_5_Wireless_Penetration_Testing.md.html)
+
+# Remarks about the material
+#### Backtrack 5 Wireless Penetration Testing Beginner's Guide
+This is an excellent book. It shows you exactly how to use tools (mostly the aircrack-ng suite), while still
+explaining how the underlying things work. In my opinion it has the perfect balance for someone who wants to learn
+how to practically crack WLANs, while actually understanding what he's doing at a lower level. This also allows you
+to easily find resources to learn more about the subject.
