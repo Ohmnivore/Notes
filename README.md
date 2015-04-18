@@ -14,7 +14,7 @@ All the notes are written in markdown, and they're the files in the repo's root 
 have these same files, but converted to html by a small Python script (`html/md2html.py` if you're curious). The HTML
 version has beautiful CSS
 ([WiTeX](https://github.com/AndrewBelt/WiTeX) by [AndrewBelt](https://github.com/AndrewBelt?tab=repositories))
-and a TABLE OF CONTENTS! Of course, GitHub doesn't serve Content Types for this, so you can check the html versions
+and a TABLE OF CONTENTS! Of course, GitHub doesn't serve content types for this, so you can check out the html versions
 below, on RawGit, or just clone/dl the repo and view locally. I really think the html version is easier to read than
 the GitHub markdown render.
 
