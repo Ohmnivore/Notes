@@ -92,6 +92,31 @@
   <li><a href="#chapter-8-attacking-wpa-enterprise-and-radius">Chapter 8: Attacking WPA-Enterprise and RADIUS</a>
   <ul>
     <li><a href="#setting-up-freeradius">Setting up FreeRadius</a></li>
+    <li><a href="#setting-up-the-ap-with-freeradius-wpe">Setting up the AP with FreeRadius-WPE</a></li>
+    <li><a href="#attacking-peap">Attacking PEAP</a></li>
+    <li><a href="#cracking-peap-with-a-honeypot">Cracking PEAP (with a Honeypot)</a></li>
+    <li><a href="#attacking-eap-ttls">Attacking EAP-TTLS</a></li>
+    <li><a href="#cracking-eap-ttls">Cracking EAP-TTLS</a></li>
+    <li><a href="#security-best-practices-for-enterprises">Security best practices for Enterprises</a></li>
+  </ul></li>
+  <li><a href="#chapter-9-wlan-penetration-testing-methodology">Chapter 9: WLAN Penetration Testing Methodology</a>
+  <ul>
+    <li><a href="#wireless-penetration-testing">Wireless penetration testing</a></li>
+    <li><a href="#planning">Planning</a></li>
+    <li><a href="#discovery">Discovery</a></li>
+    <li><a href="#discovering-wireless-devices">Discovering wireless devices</a></li>
+    <li><a href="#attack">Attack</a></li>
+    <li><a href="#finding-rogue-access-points">Finding rogue access points</a></li>
+    <li><a href="#finding-rogue-access-points-2">Finding rogue access points</a></li>
+    <li><a href="#finding-unauthorized-clients">Finding unauthorized clients</a></li>
+    <li><a href="#cracking-wpa">Cracking WPA</a></li>
+    <li><a href="#compromising-the-clients">Compromising the clients</a></li>
+    <li><a href="#reporting">Reporting</a></li>
+  </ul></li>
+  <li><a href="#appendix-a-conclusion-and-road-ahead">Appendix A: Conclusion and Road Ahead</a>
+  <ul>
+    <li><a href="#building-an-advanced-wi-fi-lab">Building an advanced Wi-Fi lab</a></li>
+    <li><a href="#staying-up-to-date">Staying up-to-date</a></li>
   </ul></li>
 </ul>
 <h1 id="notes">Notes</h1>
@@ -993,5 +1018,254 @@ when it searches for that specific SSID</li>
 <h1 id="chapter-8-attacking-wpa-enterprise-and-radius">Chapter 8: Attacking WPA-Enterprise and RADIUS</h1>
 
 <h2 id="setting-up-freeradius">Setting up FreeRadius</h2>
+
+<ul>
+<li><strong>FreeRadius</strong>: open source Radius server</li>
+<li><strong>FreeRadius-WPE</strong>: FreeRadius Wireless Pwnage Edition</li>
+<li>Pre-installed on backtrack</li>
+</ul>
+
+<h2 id="setting-up-the-ap-with-freeradius-wpe">Setting up the AP with FreeRadius-WPE</h2>
+
+<ul>
+<li>Connect computer to an Ethernet port on your AP</li>
+<li>run <code>dhclient3 &lt;interface&gt;</code> to get an IP address via DHCP</li>
+<li>Set AP's Security Mode to <strong>WPA-Enterprise</strong></li>
+<li>Under <strong>EAP (802.1x)</strong> section, set
+<strong>RADIUS server IP Address</strong> to the IP obtained earlier</li>
+<li><strong>RADIUS server Shared Secret</strong>: test</li>
+<li>cd to <code>/usr/local/etc/raddb</code> (this is where
+FreeRadius-WPE configs are)</li>
+<li>Check out <code>eap.conf</code>, leave it as it is</li>
+<li>Open <code>clients.conf</code>
+<ul>
+<li>Set <strong>secret</strong> field</li>
+</ul></li>
+<li>Start the Radius server with <code>radiusd -s -X</code></li>
+</ul>
+
+<h2 id="attacking-peap">Attacking PEAP</h2>
+
+<ul>
+<li><strong>PEAP</strong>: Protected Extensible Authentication
+Protocol</li>
+<li>PEAP: most popular EAP version, ships natively with Windows</li>
+<li>Two versions:
+<ul>
+<li>PEAPv0 - EAP-MSCHAPv2 - most popular, ships with Windows</li>
+<li>PEAPv1 - EAP-GTC</li>
+</ul></li>
+<li>PEAP uses server-side certs, most attacks will exploit
+mis-configurations of those certs</li>
+</ul>
+
+<h2 id="cracking-peap-with-a-honeypot">Cracking PEAP (with a Honeypot)</h2>
+
+<ul>
+<li>Check <code>eap.conf</code> to see that PEAP is enabled</li>
+<li>Restart Radius server: <code>Radiusd -s -X</code></li>
+<li><code>tail /usr/local/var/log/radius/freeradius-server-wpe.log
+-n 0 -f</code> to monitor the log file</li>
+<li>On Windows, turn off Certificate Verification</li>
+<li>Connect to the AP to start PEAP auth</li>
+<li>Enter some username and password
+<ul>
+<li>The response is logged in the log file</li>
+</ul></li>
+<li>Crack the password with a password list:
+<ul>
+<li><code>asleap -C &lt;challenge&gt; -R &lt;response&gt; -W list</code></li>
+</ul></li>
+</ul>
+
+<h2 id="attacking-eap-ttls">Attacking EAP-TTLS</h2>
+
+<ul>
+<li><strong>EAP-TTLS</strong>: EAP-Tunneled Transport Layer Security</li>
+<li>Server uses that to authenticate with a cert</li>
+<li>Most common auth protocol for that is MSCHAP-v2</li>
+<li>EAP-TTLS is not natively supported on Windows (but it is
+on OS X for example)</li>
+</ul>
+
+<h2 id="cracking-eap-ttls">Cracking EAP-TTLS</h2>
+
+<ul>
+<li>Enabled by default in <code>eap.conf</code></li>
+<li>Start the server and monitor the log file</li>
+<li>Connect and enter some username and password</li>
+<li>Use Asleap again to crack using a password list</li>
+</ul>
+
+<h2 id="security-best-practices-for-enterprises">Security best practices for Enterprises</h2>
+
+<ul>
+<li>Use WPA2-PSK with a strong password</li>
+<li>WPA2-Enterprise + EAP-TLS for large companies</li>
+<li>If using PEAP or EAP-TTLS
+<ul>
+<li>Turn on cert validation</li>
+<li>Choose right cert authorities</li>
+<li>Don't allow clients to accept new Radius servers, certs, or
+cert authorities</li>
+</ul></li>
+</ul>
+
+<h1 id="chapter-9-wlan-penetration-testing-methodology">Chapter 9: WLAN Penetration Testing Methodology</h1>
+
+<h2 id="wireless-penetration-testing">Wireless penetration testing</h2>
+
+<ul>
+<li>Phases:
+<ul>
+<li>Planning phase</li>
+<li>Discovery phase</li>
+<li>Attack phase</li>
+<li>Reporting phase</li>
+</ul></li>
+</ul>
+
+<h2 id="planning">Planning</h2>
+
+<ul>
+<li>Scope of the assessment: location, area, number of APs and
+clients, which networks, full exploit or simply informed</li>
+<li>Effort estimation: time frame, depth of testing</li>
+<li>Legality: indemnity agreement, NDA, local laws</li>
+</ul>
+
+<h2 id="discovery">Discovery</h2>
+
+<h2 id="discovering-wireless-devices">Discovering wireless devices</h2>
+
+<ul>
+<li>Create a monitor mode interface
+<ul>
+<li><code>ifoncifg -a</code></li>
+<li><code>ifocnfig &lt;wireless interface&gt; up</code></li>
+<li><code>airmon-ng start &lt;wireless interface&gt;</code></li>
+</ul></li>
+<li>Scan the airspace
+<ul>
+<li><code>airodump-ng --band bg --cswitch 1 mon0</code>: ensures
+channel hopping happens on both 802.11b 802.11g</li>
+</ul></li>
+<li>Move around the area to get the most APs and clients</li>
+<li>From the admins, obtain a list of MAC address for all APs
+and clients</li>
+</ul>
+
+<h2 id="attack">Attack</h2>
+
+<ul>
+<li>Finding rogue APs</li>
+<li>Finding client mis-associations</li>
+<li>Finding unauthorized clients</li>
+<li>Cracking the encryption</li>
+<li>Breaking into the infrastructure</li>
+<li>Compromising clients</li>
+</ul>
+
+<h2 id="finding-rogue-access-points">Finding rogue access points</h2>
+
+<ul>
+<li>Authorized AP:
+<ul>
+<li>ESSID: Wireless Lab</li>
+<li>MAC Address: 00:21:91:D2:8E:25</li>
+<li>Configuration: WPA-PSK</li>
+</ul></li>
+<li>Authorized Clients:
+<ul>
+<li>MAC Address: 60:FB:42:D5:E4:01</li>
+</ul></li>
+</ul>
+
+<h2 id="finding-rogue-access-points-2">Finding rogue access points</h2>
+
+<ul>
+<li>In most cases AP's wired and wireless MAC address differ by
+1</li>
+</ul>
+
+<h2 id="finding-unauthorized-clients">Finding unauthorized clients</h2>
+
+<ul>
+<li>Look at the client part of airodump-ng</li>
+<li>Look for unauthorized MAC addresses</li>
+</ul>
+
+<h2 id="cracking-wpa">Cracking WPA</h2>
+
+<ul>
+<li><code>airodump-ng --channel &lt;channel&gt; --bssid &lt;AP MAC&gt; --write
+WPA-PSK &lt;interface&gt;</code></li>
+<li>Wait for a handshake or de-auth a client</li>
+<li><code>aircrack-ng -b &lt;AP MAC&gt; -w &lt;dictionary&gt; WPA-PSK-01.cap</code></li>
+</ul>
+
+<h2 id="compromising-the-clients">Compromising the clients</h2>
+
+<ul>
+<li>Run <code>airodump-ng</code></li>
+<li>Some clients may have multiple preferred networks
+(<strong>Probes</strong> column)</li>
+<li>Create an evil twin AP: <code>airbase-ng --essid &lt;name&gt;
+&lt;interface&gt;</code></li>
+<li>Disconnect the client: <code>aireplay-ng --deauth 0 -a
+&lt;client MAC&gt; &lt;interface&gt;</code></li>
+<li>Client connects to the fake AP</li>
+</ul>
+
+<h2 id="reporting">Reporting</h2>
+
+<ul>
+<li>Vulnerability description</li>
+<li>Severity</li>
+<li>Affected devices</li>
+<li>Vulnerability type: software, hardware, or config</li>
+<li>Workarounds</li>
+<li>Remediation</li>
+</ul>
+
+<h1 id="appendix-a-conclusion-and-road-ahead">Appendix A: Conclusion and Road Ahead</h1>
+
+<h2 id="building-an-advanced-wi-fi-lab">Building an advanced Wi-Fi lab</h2>
+
+<ul>
+<li>Directional Antennas:
+<ul>
+<li>Boosts signal</li>
+<li>Detect networks from further away</li>
+</ul></li>
+<li>Check out other AP models</li>
+<li>Try out other Wi-Fi cards</li>
+<li>Try exploiting cell-phones and tablets too</li>
+</ul>
+
+<h2 id="staying-up-to-date">Staying up-to-date</h2>
+
+<ul>
+<li>Mailing Lists:
+<ul>
+<li>http://www.securityfocus.com/</li>
+<li>Wifisec@securityfocus.com</li>
+</ul></li>
+<li>Websites
+<ul>
+<li>http://www.aircrack-ng.org</li>
+<li>http://www.raulsiles.com/resources/wifi.html</li>
+<li>http://www.willhackforsushi.com/</li>
+</ul></li>
+<li>Conferences
+<ul>
+<li>http://www.defcon.org</li>
+<li>http://www.blackhat.com</li>
+</ul></li>
+<li>BackTrack/Kali
+<ul>
+<li>http://www.offensive-security.com</li>
+</ul></li>
+</ul>
 </body>
 </html>

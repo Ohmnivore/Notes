@@ -637,3 +637,162 @@ when it searches for that specific SSID
 
 # Chapter 8: Attacking WPA-Enterprise and RADIUS
 ## Setting up FreeRadius
+* **FreeRadius**: open source Radius server
+* **FreeRadius-WPE**: FreeRadius Wireless Pwnage Edition
+* Pre-installed on backtrack
+
+## Setting up the AP with FreeRadius-WPE
+* Connect computer to an Ethernet port on your AP
+* run `dhclient3 <interface>` to get an IP address via DHCP
+* Set AP's Security Mode to **WPA-Enterprise**
+* Under **EAP (802.1x)** section, set
+**RADIUS server IP Address** to the IP obtained earlier
+* **RADIUS server Shared Secret**: test
+* cd to `/usr/local/etc/raddb` (this is where
+FreeRadius-WPE configs are)
+* Check out `eap.conf`, leave it as it is
+* Open `clients.conf`
+ * Set **secret** field
+* Start the Radius server with `radiusd -s -X`
+
+## Attacking PEAP
+* **PEAP**: Protected Extensible Authentication
+Protocol
+* PEAP: most popular EAP version, ships natively with Windows
+* Two versions:
+ * PEAPv0 - EAP-MSCHAPv2 - most popular, ships with Windows
+ * PEAPv1 - EAP-GTC
+* PEAP uses server-side certs, most attacks will exploit
+mis-configurations of those certs
+
+## Cracking PEAP (with a Honeypot)
+* Check `eap.conf` to see that PEAP is enabled
+* Restart Radius server: `Radiusd -s -X`
+* `tail /usr/local/var/log/radius/freeradius-server-wpe.log
+-n 0 -f` to monitor the log file
+* On Windows, turn off Certificate Verification
+* Connect to the AP to start PEAP auth
+* Enter some username and password
+ * The response is logged in the log file
+* Crack the password with a password list:
+ * `asleap -C <challenge> -R <response> -W list`
+
+## Attacking EAP-TTLS
+* **EAP-TTLS**: EAP-Tunneled Transport Layer Security
+* Server uses that to authenticate with a cert
+* Most common auth protocol for that is MSCHAP-v2
+* EAP-TTLS is not natively supported on Windows (but it is
+on OS X for example)
+
+## Cracking EAP-TTLS
+* Enabled by default in `eap.conf`
+* Start the server and monitor the log file
+* Connect and enter some username and password
+* Use Asleap again to crack using a password list
+
+## Security best practices for Enterprises
+* Use WPA2-PSK with a strong password
+* WPA2-Enterprise + EAP-TLS for large companies
+* If using PEAP or EAP-TTLS
+ * Turn on cert validation
+ * Choose right cert authorities
+ * Don't allow clients to accept new Radius servers, certs, or
+ cert authorities
+
+# Chapter 9: WLAN Penetration Testing Methodology
+## Wireless penetration testing
+* Phases:
+ * Planning phase
+ * Discovery phase
+ * Attack phase
+ * Reporting phase
+
+## Planning
+* Scope of the assessment: location, area, number of APs and
+clients, which networks, full exploit or simply informed
+* Effort estimation: time frame, depth of testing
+* Legality: indemnity agreement, NDA, local laws
+
+## Discovery
+## Discovering wireless devices
+* Create a monitor mode interface
+ * `ifoncifg -a`
+ * `ifocnfig <wireless interface> up`
+ * `airmon-ng start <wireless interface>`
+* Scan the airspace
+ * `airodump-ng --band bg --cswitch 1 mon0`: ensures
+ channel hopping happens on both 802.11b 802.11g
+* Move around the area to get the most APs and clients
+* From the admins, obtain a list of MAC address for all APs
+and clients
+
+## Attack
+* Finding rogue APs
+* Finding client mis-associations
+* Finding unauthorized clients
+* Cracking the encryption
+* Breaking into the infrastructure
+* Compromising clients
+
+## Finding rogue access points
+* Authorized AP:
+ * ESSID: Wireless Lab
+ * MAC Address: 00:21:91:D2:8E:25
+ * Configuration: WPA-PSK
+* Authorized Clients:
+ * MAC Address: 60:FB:42:D5:E4:01
+
+## Finding rogue access points
+* In most cases AP's wired and wireless MAC address differ by
+1
+
+## Finding unauthorized clients
+* Look at the client part of airodump-ng
+* Look for unauthorized MAC addresses
+
+## Cracking WPA
+* `airodump-ng --channel <channel> --bssid <AP MAC> --write
+WPA-PSK <interface>`
+* Wait for a handshake or de-auth a client
+* `aircrack-ng -b <AP MAC> -w <dictionary> WPA-PSK-01.cap`
+
+## Compromising the clients
+* Run `airodump-ng`
+* Some clients may have multiple preferred networks
+(**Probes** column)
+* Create an evil twin AP: `airbase-ng --essid <name>
+<interface>`
+* Disconnect the client: `aireplay-ng --deauth 0 -a
+<client MAC> <interface>`
+* Client connects to the fake AP
+
+## Reporting
+* Vulnerability description
+* Severity
+* Affected devices
+* Vulnerability type: software, hardware, or config
+* Workarounds
+* Remediation
+
+# Appendix A: Conclusion and Road Ahead
+## Building an advanced Wi-Fi lab
+* Directional Antennas:
+ * Boosts signal
+ * Detect networks from further away
+* Check out other AP models
+* Try out other Wi-Fi cards
+* Try exploiting cell-phones and tablets too
+
+## Staying up-to-date
+* Mailing Lists:
+ * http://www.securityfocus.com/
+ * Wifisec@securityfocus.com
+* Websites
+ * http://www.aircrack-ng.org
+ * http://www.raulsiles.com/resources/wifi.html
+ * http://www.willhackforsushi.com/
+* Conferences
+ * http://www.defcon.org
+ * http://www.blackhat.com
+* BackTrack/Kali
+ * http://www.offensive-security.com
